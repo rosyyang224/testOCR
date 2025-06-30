@@ -1,6 +1,8 @@
 import UIKit
 import Vision
 import Photos
+import StringMetric
+
 
 final class ImageUploadController: UIViewController {
     private let imagePicker = UIImagePickerController()
@@ -170,10 +172,8 @@ final class ImageUploadController: UIViewController {
            }
            return first.boundingBox.origin.x < second.boundingBox.origin.x
        }
-
-       // Extract key-value pairs
-        let linesInOrder = recognizedTexts.map { $0.text }
-        let keyValuePairs = extractKeyValuePairs(from: linesInOrder)
+        
+        let keyValuePairs = extractKeyValuePairs(from: results)
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
@@ -197,35 +197,60 @@ final class ImageUploadController: UIViewController {
        }
    }
     
-   private func extractKeyValuePairs(from lines: [String]) -> [RecognizedKeyValue] {
+    private func extractKeyValuePairs(from observations: [VNRecognizedTextObservation]) -> [RecognizedKeyValue] {
         var results: [RecognizedKeyValue] = []
 
-        // Normalize input text
-        let cleanedLines = lines.map { $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() }
-
-        // Helper: fuzzy match to known keys
-        func matchElement(in text: String) -> RecognizedKeyValue.DocumentElement? {
-            return RecognizedKeyValue.DocumentElement.allCases.first(where: { element in
-                let normalizedKey = element.rawValue.uppercased()
-                let matchKeywords = normalizedKey.components(separatedBy: " ")
-                return matchKeywords.allSatisfy { text.contains($0) }
-            })
+        let lines: [(text: String, box: CGRect, observation: VNRecognizedTextObservation)] = observations.compactMap {
+            guard let text = $0.topCandidates(1).first?.string else { return nil }
+            return (text.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), $0.boundingBox, $0)
         }
 
-        for line in cleanedLines {
-            guard let matchedField = matchElement(in: line) else { continue }
+        for (keyText, keyBox, keyObs) in lines {
+            let normalizedKey = keyText.uppercased()
 
-            // Try to get next line as value (naive assumption)
-            if let idx = cleanedLines.firstIndex(of: line),
-               idx + 1 < cleanedLines.count {
-                let valueLine = cleanedLines[idx + 1]
-                let keyValue = RecognizedKeyValue(
-                    key: matchedField.rawValue,
-                    keyTextObservation: VNRecognizedTextObservation(), // Placeholder
-                    value: valueLine,
-                    valueTextObservation: nil
+            guard let matchedElement = RecognizedKeyValue.DocumentElement.allCases.first(where: { element in
+                element.keywords.contains(where: { keyword in
+                    keyword.distance(between: normalizedKey) > 0.88
+                })
+            }) else {
+                continue
+            }
+
+
+            let isHorizontal = keyText.contains("SURNAME") || keyText.contains("GIVEN") || keyText.contains("DOCUMENT")
+
+            let candidates = lines.filter { candidate in
+                candidate.observation != keyObs &&
+                !RecognizedKeyValue.DocumentElement.allKeywords.contains(candidate.text)
+            }
+
+            let valueCandidate = candidates
+                .filter { candidate in
+                    if isHorizontal {
+                        let sameRow = abs(candidate.box.midY - keyBox.midY) < 0.05
+                        let rightOfKey = candidate.box.minX > keyBox.maxX
+                        return sameRow && rightOfKey
+                    } else {
+                        let below = candidate.box.maxY < keyBox.minY
+                        let alignedHorizontally = abs(candidate.box.midX - keyBox.midX) < 0.2
+                        return below && alignedHorizontally
+                    }
+                }
+                .min(by: { a, b in
+                    let aDistance = hypot(a.box.midX - keyBox.midX, a.box.midY - keyBox.midY)
+                    let bDistance = hypot(b.box.midX - keyBox.midX, b.box.midY - keyBox.midY)
+                    return aDistance < bDistance
+                })
+
+            if let match = valueCandidate {
+                results.append(
+                    RecognizedKeyValue(
+                        key: matchedElement.rawValue,
+                        keyTextObservation: keyObs,
+                        value: match.text,
+                        valueTextObservation: match.observation
+                    )
                 )
-                results.append(keyValue)
             }
         }
 

@@ -14,7 +14,7 @@ struct RecognizedKeyValue {
         case vertical
         case horizontal
     }
-    
+
     enum DocumentElement: String, CaseIterable {
         case surname = "SURNAME"
         case givenNames = "GIVEN NAMES"
@@ -25,6 +25,33 @@ struct RecognizedKeyValue {
         case dateOfIssue = "DATE OF ISSUE"
         case dateOfExpiry = "DATE OF EXPIRY"
         case sex = "SEX"
+        
+        static var allKeywords: Set<String> {
+            Set(Self.allCases.flatMap { $0.keywords.map { $0.uppercased() } })
+        }
+
+        var keywords: [String] {
+            switch self {
+            case .surname:
+                return ["SURNAME", "FAMILY NAME", "LAST NAME"]
+            case .givenNames:
+                return ["GIVEN NAME", "GIVEN NAMES", "FIRST NAME"]
+            case .dateOfBirth:
+                return ["DATE OF BIRTH", "BIRTHDATE", "DOB"]
+            case .documentNo:
+                return ["DOCUMENT NO.", "DOCUMENT NUMBER", "DOC NO", "PASSPORT NO", "PASSPORT NUMBER"]
+            case .placeOfBirth:
+                return ["PLACE OF BIRTH", "BIRTHPLACE"]
+            case .nationality:
+                return ["NATIONALITY", "CITIZENSHIP"]
+            case .dateOfIssue:
+                return ["DATE OF ISSUE", "ISSUE DATE"]
+            case .dateOfExpiry:
+                return ["DATE OF EXPIRY", "EXPIRATION DATE", "EXPIRY DATE", "DATE OF EXP"]
+            case .sex:
+                return ["SEX", "GENDER"]
+            }
+        }
     }
     
     let key: String

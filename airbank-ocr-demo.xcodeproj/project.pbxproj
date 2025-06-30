@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,6 +11,7 @@
 		A37771452E127266005E6BC5 /* MainAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771442E127266005E6BC5 /* MainAppDelegate.swift */; };
 		A37771472E12726B005E6BC5 /* TextOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771462E12726B005E6BC5 /* TextOverlay.swift */; };
 		A37771492E127270005E6BC5 /* WindowSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */; };
+		A377714C2E12B137005E6BC5 /* StringMetric in Frameworks */ = {isa = PBXBuildFile; productRef = A377714B2E12B137005E6BC5 /* StringMetric */; };
 		DF60302223853620009AAFC8 /* RecognizedKeyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */; };
 		DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */; };
 		DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */; };
@@ -33,6 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A377714C2E12B137005E6BC5 /* StringMetric in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,6 +116,9 @@
 				Base,
 			);
 			mainGroup = DFAD6E782382AABB00FE14F7;
+			packageReferences = (
+				A377714A2E12B136005E6BC5 /* XCRemoteSwiftPackageReference "StringMetric" */,
+			);
 			productRefGroup = DFAD6E822382AABB00FE14F7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -334,6 +339,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A377714A2E12B136005E6BC5 /* XCRemoteSwiftPackageReference "StringMetric" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/autozimu/StringMetric.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A377714B2E12B137005E6BC5 /* StringMetric */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A377714A2E12B136005E6BC5 /* XCRemoteSwiftPackageReference "StringMetric" */;
+			productName = StringMetric;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DFAD6E792382AABB00FE14F7 /* Project object */;
 }
