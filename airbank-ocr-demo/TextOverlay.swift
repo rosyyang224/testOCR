@@ -5,9 +5,14 @@ final class TextOverlayView: UIView {
     private var layers = [CAShapeLayer]()
 
     func drawBoundingBox(for observation: VNRecognizedTextObservation) {
-        let scale = CGAffineTransform(scaleX: bounds.width, y: bounds.height)
-        let flip = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: -bounds.height)
-        let rect = observation.boundingBox.applying(scale).applying(flip)
+        let imageRect = bounds
+
+        let rect = CGRect(
+            x: observation.boundingBox.minX * imageRect.width,
+            y: (1 - observation.boundingBox.maxY) * imageRect.height,
+            width: observation.boundingBox.width * imageRect.width,
+            height: observation.boundingBox.height * imageRect.height
+        )
 
         let shape = CAShapeLayer()
         shape.frame = rect

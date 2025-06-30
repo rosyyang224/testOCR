@@ -21,6 +21,22 @@ final class ImageUploadController: UIViewController {
         iv.contentMode = .scaleAspectFit
         return iv
     }()
+    
+    private func updateOverlayFrame(for image: UIImage) {
+        let imageSize = image.size
+        let imageViewSize = imagePreview.bounds.size
+
+        let rect = AVMakeRect(aspectRatio: imageSize, insideRect: CGRect(origin: .zero, size: imageViewSize))
+        overlayView.frame = rect
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if let image = currentImage, isImageVisible {
+            updateOverlayFrame(for: image)
+        }
+    }
 
     private lazy var uploadButton: UIButton = {
         let button = UIButton(type: .roundedRect)
@@ -261,10 +277,10 @@ func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMe
     navigationItem.rightBarButtonItem?.isEnabled = true
     currentImage = image
     imagePreview.image = image
+    updateOverlayFrame(for: image)
     isImageVisible = true
     navigationItem.rightBarButtonItem?.title = "Hide Image"
     
-    imagePreview.image = image
     processImage(image)
 }
 }
