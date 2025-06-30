@@ -7,25 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A37771432E127260005E6BC5 /* ImageUploadController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771422E127260005E6BC5 /* ImageUploadController.swift */; };
+		A37771452E127266005E6BC5 /* MainAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771442E127266005E6BC5 /* MainAppDelegate.swift */; };
+		A37771472E12726B005E6BC5 /* TextOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771462E12726B005E6BC5 /* TextOverlay.swift */; };
+		A37771492E127270005E6BC5 /* WindowSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */; };
 		DF60302223853620009AAFC8 /* RecognizedKeyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */; };
-		DFAD6E852382AABB00FE14F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAD6E842382AABB00FE14F7 /* AppDelegate.swift */; };
-		DFAD6E872382AABB00FE14F7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAD6E862382AABB00FE14F7 /* SceneDelegate.swift */; };
-		DFAD6E892382AABB00FE14F7 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAD6E882382AABB00FE14F7 /* ViewController.swift */; };
 		DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */; };
 		DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */; };
-		DFAD6E992382B59900FE14F7 /* PreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAD6E982382B59900FE14F7 /* PreviewView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A37771422E127260005E6BC5 /* ImageUploadController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadController.swift; sourceTree = "<group>"; };
+		A37771442E127266005E6BC5 /* MainAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainAppDelegate.swift; sourceTree = "<group>"; };
+		A37771462E12726B005E6BC5 /* TextOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlay.swift; sourceTree = "<group>"; };
+		A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneCoordinator.swift; sourceTree = "<group>"; };
 		DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecognizedKeyValue.swift; sourceTree = "<group>"; };
 		DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "airbank-ocr-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		DFAD6E842382AABB00FE14F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		DFAD6E862382AABB00FE14F7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		DFAD6E882382AABB00FE14F7 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DFAD6E902382AABE00FE14F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DFAD6E922382AABE00FE14F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DFAD6E982382B59900FE14F7 /* PreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,14 +58,14 @@
 		DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */ = {
 			isa = PBXGroup;
 			children = (
-				DFAD6E842382AABB00FE14F7 /* AppDelegate.swift */,
-				DFAD6E862382AABB00FE14F7 /* SceneDelegate.swift */,
-				DFAD6E882382AABB00FE14F7 /* ViewController.swift */,
-				DFAD6E982382B59900FE14F7 /* PreviewView.swift */,
 				DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */,
 				DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */,
 				DFAD6E922382AABE00FE14F7 /* Info.plist */,
 				DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */,
+				A37771422E127260005E6BC5 /* ImageUploadController.swift */,
+				A37771442E127266005E6BC5 /* MainAppDelegate.swift */,
+				A37771462E12726B005E6BC5 /* TextOverlay.swift */,
+				A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */,
 			);
 			path = "airbank-ocr-demo";
 			sourceTree = "<group>";
@@ -140,11 +140,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DFAD6E892382AABB00FE14F7 /* ViewController.swift in Sources */,
-				DFAD6E992382B59900FE14F7 /* PreviewView.swift in Sources */,
+				A37771432E127260005E6BC5 /* ImageUploadController.swift in Sources */,
 				DF60302223853620009AAFC8 /* RecognizedKeyValue.swift in Sources */,
-				DFAD6E852382AABB00FE14F7 /* AppDelegate.swift in Sources */,
-				DFAD6E872382AABB00FE14F7 /* SceneDelegate.swift in Sources */,
+				A37771452E127266005E6BC5 /* MainAppDelegate.swift in Sources */,
+				A37771472E12726B005E6BC5 /* TextOverlay.swift in Sources */,
+				A37771492E127270005E6BC5 /* WindowSceneCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
