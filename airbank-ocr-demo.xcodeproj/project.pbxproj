@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,16 +12,30 @@
 		A37771472E12726B005E6BC5 /* TextOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771462E12726B005E6BC5 /* TextOverlay.swift */; };
 		A37771492E127270005E6BC5 /* WindowSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */; };
 		A377714C2E12B137005E6BC5 /* StringMetric in Frameworks */ = {isa = PBXBuildFile; productRef = A377714B2E12B137005E6BC5 /* StringMetric */; };
+		A377715E2E12CA1E005E6BC5 /* TextObservationRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A377715D2E12CA1E005E6BC5 /* TextObservationRepresentable.swift */; };
+		A37771612E12CB3C005E6BC5 /* TextObservationRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A377715D2E12CA1E005E6BC5 /* TextObservationRepresentable.swift */; };
 		DF60302223853620009AAFC8 /* RecognizedKeyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */; };
 		DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */; };
 		DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A37771552E12C179005E6BC5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DFAD6E792382AABB00FE14F7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DFAD6E802382AABB00FE14F7;
+			remoteInfo = "airbank-ocr-demo";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A37771422E127260005E6BC5 /* ImageUploadController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadController.swift; sourceTree = "<group>"; };
 		A37771442E127266005E6BC5 /* MainAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainAppDelegate.swift; sourceTree = "<group>"; };
 		A37771462E12726B005E6BC5 /* TextOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlay.swift; sourceTree = "<group>"; };
 		A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneCoordinator.swift; sourceTree = "<group>"; };
+		A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "airbank-ocr-demoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A377715D2E12CA1E005E6BC5 /* TextObservationRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextObservationRepresentable.swift; sourceTree = "<group>"; };
 		DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecognizedKeyValue.swift; sourceTree = "<group>"; };
 		DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "airbank-ocr-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -29,7 +43,18 @@
 		DFAD6E922382AABE00FE14F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		A37771522E12C179005E6BC5 /* airbank-ocr-demoUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "airbank-ocr-demoUITests"; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
+		A377714E2E12C179005E6BC5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DFAD6E7E2382AABB00FE14F7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -45,6 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */,
+				A37771522E12C179005E6BC5 /* airbank-ocr-demoUITests */,
 				DFAD6E822382AABB00FE14F7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -53,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */,
+				A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -60,6 +87,7 @@
 		DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */ = {
 			isa = PBXGroup;
 			children = (
+				A377715D2E12CA1E005E6BC5 /* TextObservationRepresentable.swift */,
 				DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */,
 				DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */,
 				DFAD6E922382AABE00FE14F7 /* Info.plist */,
@@ -75,6 +103,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		A37771502E12C179005E6BC5 /* airbank-ocr-demoUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A37771572E12C179005E6BC5 /* Build configuration list for PBXNativeTarget "airbank-ocr-demoUITests" */;
+			buildPhases = (
+				A377714D2E12C179005E6BC5 /* Sources */,
+				A377714E2E12C179005E6BC5 /* Frameworks */,
+				A377714F2E12C179005E6BC5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A37771562E12C179005E6BC5 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A37771522E12C179005E6BC5 /* airbank-ocr-demoUITests */,
+			);
+			name = "airbank-ocr-demoUITests";
+			packageProductDependencies = (
+			);
+			productName = "airbank-ocr-demoUITests";
+			productReference = A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		DFAD6E802382AABB00FE14F7 /* airbank-ocr-demo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DFAD6E952382AABE00FE14F7 /* Build configuration list for PBXNativeTarget "airbank-ocr-demo" */;
@@ -98,10 +149,14 @@
 		DFAD6E792382AABB00FE14F7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1120;
+				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = "Marek Přidal";
 				TargetAttributes = {
+					A37771502E12C179005E6BC5 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = DFAD6E802382AABB00FE14F7;
+					};
 					DFAD6E802382AABB00FE14F7 = {
 						CreatedOnToolsVersion = 11.2.1;
 					};
@@ -124,11 +179,19 @@
 			projectRoot = "";
 			targets = (
 				DFAD6E802382AABB00FE14F7 /* airbank-ocr-demo */,
+				A37771502E12C179005E6BC5 /* airbank-ocr-demoUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		A377714F2E12C179005E6BC5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DFAD6E7F2382AABB00FE14F7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -141,6 +204,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		A377714D2E12C179005E6BC5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A37771612E12CB3C005E6BC5 /* TextObservationRepresentable.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DFAD6E7D2382AABB00FE14F7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -149,11 +220,20 @@
 				DF60302223853620009AAFC8 /* RecognizedKeyValue.swift in Sources */,
 				A37771452E127266005E6BC5 /* MainAppDelegate.swift in Sources */,
 				A37771472E12726B005E6BC5 /* TextOverlay.swift in Sources */,
+				A377715E2E12CA1E005E6BC5 /* TextObservationRepresentable.swift in Sources */,
 				A37771492E127270005E6BC5 /* WindowSceneCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A37771562E12C179005E6BC5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DFAD6E802382AABB00FE14F7 /* airbank-ocr-demo */;
+			targetProxy = A37771552E12C179005E6BC5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */ = {
@@ -167,6 +247,57 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		A37771582E12C179005E6BC5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.airbank-ocr-demoUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/airbank-ocr-demo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/airbank-ocr-demo";
+			};
+			name = Debug;
+		};
+		A37771592E12C179005E6BC5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.airbank-ocr-demoUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/airbank-ocr-demo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/airbank-ocr-demo";
+			};
+			name = Release;
+		};
 		DFAD6E932382AABE00FE14F7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -320,6 +451,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		A37771572E12C179005E6BC5 /* Build configuration list for PBXNativeTarget "airbank-ocr-demoUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A37771582E12C179005E6BC5 /* Debug */,
+				A37771592E12C179005E6BC5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		DFAD6E7C2382AABB00FE14F7 /* Build configuration list for PBXProject "airbank-ocr-demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
