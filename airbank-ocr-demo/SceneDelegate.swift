@@ -12,29 +12,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         if let windowScene = scene as? UIWindowScene {
             window = UIWindow(windowScene: windowScene)
             window?.makeKeyAndVisible()
-            
+
+            // Set up the single tab bar controller with just one view controller
             let tabBarController = UITabBarController()
             window?.rootViewController = tabBarController
-            
+
             let navigationController = UINavigationController()
             let viewController = ViewController()
-            navigationController.pushViewController(viewController, animated: true)
+            navigationController.viewControllers = [viewController]
             navigationController.tabBarItem = UITabBarItem(title: "Image picker", image: UIImage(systemName: "photo"), selectedImage: UIImage(systemName: "photo.fill"))
-            
-            let liveDemoNavigationController = UINavigationController()
-            liveDemoNavigationController.tabBarItem = UITabBarItem(title: "Live", image: UIImage(systemName: "livephoto"), selectedImage: nil)
-            let liveDemoVC = LiveDemoViewController()
-            liveDemoNavigationController.pushViewController(liveDemoVC, animated: true)
-            
-            tabBarController.setViewControllers([navigationController, liveDemoNavigationController], animated: true)
+
+            tabBarController.setViewControllers([navigationController], animated: false)
         }
     }
 
