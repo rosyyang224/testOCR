@@ -235,16 +235,19 @@ final class ImageUploadController: UIViewController {
         }
 
         for (keyText, keyBox, keyObs) in lines {
-            let normalizedKey = keyText.uppercased()
+            let keyParts = keyText.uppercased()
+                .split(separator: "/")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
 
             guard let matchedElement = RecognizedKeyValue.DocumentElement.allCases.first(where: { element in
-                element.keywords.contains(where: { keyword in
-                    keyword.distance(between: normalizedKey) > 0.88
+                keyParts.contains(where: { part in
+                    element.keywords.contains(where: { keyword in
+                        keyword.distance(between: part) > 0.88
+                    })
                 })
             }) else {
                 continue
             }
-
 
             let isHorizontal = keyText.contains("SURNAME") || keyText.contains("GIVEN") || keyText.contains("DOCUMENT")
 
