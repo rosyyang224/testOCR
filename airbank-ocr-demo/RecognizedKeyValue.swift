@@ -54,12 +54,24 @@ struct RecognizedKeyValue {
         }
     }
     
+//    let key: String
+//    let keyTextObservation: VNRecognizedTextObservation
     let key: String
-    let keyTextObservation: VNRecognizedTextObservation
+    let keyTextObservation: VNRecognizedTextObservation? // ← optional
+    let value: String?
+    let valueTextObservation: VNRecognizedTextObservation? // ← optional
     
+//    var keyPosition: VNRectangleObservation? {
+//        try? keyTextObservation.topCandidates(10).first(where: { $0.string == key })?.boundingBox(for: Range<String.Index>.init(uncheckedBounds: (key.startIndex, key.endIndex)))
+//    }
     var keyPosition: VNRectangleObservation? {
-        try? keyTextObservation.topCandidates(10).first(where: { $0.string == key })?.boundingBox(for: Range<String.Index>.init(uncheckedBounds: (key.startIndex, key.endIndex)))
+        guard let obs = keyTextObservation else { return nil }
+        return try? obs
+            .topCandidates(10)
+            .first(where: { $0.string == key })?
+            .boundingBox(for: key.startIndex..<key.endIndex)
     }
+
     var alignment: Alignment {
         key.contains("SURNAME") || key.contains("GIVEN NAMES") || key.contains("DOCUMENT NO.") ? .horizontal : .vertical
     }
@@ -67,6 +79,6 @@ struct RecognizedKeyValue {
         DocumentElement(rawValue: key)
     }
 
-    var value: String?
-    var valueTextObservation: VNRecognizedTextObservation?
+//    var value: String?
+//    var valueTextObservation: VNRecognizedTextObservation?
 }

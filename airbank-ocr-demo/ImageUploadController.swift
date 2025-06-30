@@ -162,6 +162,13 @@ final class ImageUploadController: UIViewController {
             print("No text recognized.")
             return
         }
+        
+        print("🔍 Raw OCR Results:")
+        for observation in results {
+            if let text = observation.topCandidates(1).first?.string {
+                print("• \"\(text)\" — box: \(observation.boundingBox)")
+            }
+        }
 
        let recognizedTexts = results.compactMap { observation -> (text: String, boundingBox: CGRect)? in
            guard let text = observation.topCandidates(1).first?.string else { return nil }
@@ -197,8 +204,30 @@ final class ImageUploadController: UIViewController {
        }
    }
     
-    private func extractKeyValuePairs(from observations: [VNRecognizedTextObservation]) -> [RecognizedKeyValue] {
+    func isValidMatch(for key: String, value: String) -> Bool {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        switch key.uppercased() {
+        case "DATE OF BIRTH", "DATE OF ISSUE", "DATE OF EXPIRATION":
+            return trimmed.range(of: #"(\d{1,2}[\/\-.])?\d{1,2}[\/\-.]\d{2,4}"#, options: .regularExpression) != nil
+        case "SEX":
+            return trimmed.range(of: #"^(M|F|MALE|FEMALE)$"#, options: [.regularExpression, .caseInsensitive]) != nil
+        case "GIVEN NAMES", "SURNAME", "NAME":
+            return trimmed.range(of: #"^[A-Z]+(?: [A-Z]+)*$"#, options: .regularExpression) != nil
+        default:
+            return true
+        }
+    }
+
+    
+    internal func extractKeyValuePairs(from observations: [VNRecognizedTextObservation]) -> [RecognizedKeyValue] {
         var results: [RecognizedKeyValue] = []
+        
+        func euclideanDistance(from a: CGRect, to b: CGRect) -> CGFloat {
+                let dx = a.midX - b.midX
+                let dy = a.midY - b.midY
+                return sqrt(dx * dx + dy * dy)
+            }
 
         let lines: [(text: String, box: CGRect, observation: VNRecognizedTextObservation)] = observations.compactMap {
             guard let text = $0.topCandidates(1).first?.string else { return nil }
@@ -221,37 +250,35 @@ final class ImageUploadController: UIViewController {
 
             let candidates = lines.filter { candidate in
                 candidate.observation != keyObs &&
-                !RecognizedKeyValue.DocumentElement.allKeywords.contains(candidate.text)
-            }
-
-            let valueCandidate = candidates
-                .filter { candidate in
-                    if isHorizontal {
-                        let sameRow = abs(candidate.box.midY - keyBox.midY) < 0.05
-                        let rightOfKey = candidate.box.minX > keyBox.maxX
-                        return sameRow && rightOfKey
-                    } else {
-                        let below = candidate.box.maxY < keyBox.minY
-                        let alignedHorizontally = abs(candidate.box.midX - keyBox.midX) < 0.2
-                        return below && alignedHorizontally
-                    }
-                }
-                .min(by: { a, b in
-                    let aDistance = hypot(a.box.midX - keyBox.midX, a.box.midY - keyBox.midY)
-                    let bDistance = hypot(b.box.midX - keyBox.midX, b.box.midY - keyBox.midY)
-                    return aDistance < bDistance
+                !RecognizedKeyValue.DocumentElement.allKeywords.contains(where: {
+                    $0.distance(between: candidate.text) > 0.88
                 })
-
-            if let match = valueCandidate {
-                results.append(
-                    RecognizedKeyValue(
-                        key: matchedElement.rawValue,
-                        keyTextObservation: keyObs,
-                        value: match.text,
-                        valueTextObservation: match.observation
-                    )
-                )
             }
+
+            let filteredCandidates = candidates.filter { candidate in
+                let isToRight = candidate.box.minX > keyBox.midX - 0.01
+                let isBelow = candidate.box.midY < keyBox.midY - 0.01
+                return isToRight || isBelow
+            }
+
+            let bestMatch = filteredCandidates.min {
+                euclideanDistance(from: keyBox, to: $0.box) < euclideanDistance(from: keyBox, to: $1.box)
+            }
+
+
+            if let match = bestMatch, isValidMatch(for: matchedElement.rawValue, value: match.text) {
+                results.append(RecognizedKeyValue(
+                    key: matchedElement.rawValue,
+                    keyTextObservation: keyObs,
+                    value: match.text,
+                    valueTextObservation: match.observation
+                ))
+                print("Matched key: \(matchedElement.rawValue)")
+                print("Key text: \(keyText)")
+                print("Matched value: \(match.text)\n")
+
+            }
+            
         }
 
         return results
@@ -261,15 +288,58 @@ final class ImageUploadController: UIViewController {
     private func processImage(_ image: UIImage) {
         guard let cgImage = image.cgImage else { return }
 
+        let rectangleRequest = VNDetectRectanglesRequest { [weak self] request, error in
+            guard let self = self else { return }
+
+            if let rectObservation = request.results?.first as? VNRectangleObservation {
+                print("Detected document rectangle")
+
+                DispatchQueue.main.async {
+                    self.overlayView.drawBoundingBox(for: rectObservation.boundingBox, color: .green, lineWidth: 2.0)
+                }
+
+                self.runOCR(on: cgImage, regionOfInterest: rectObservation.boundingBox)
+            } else {
+                print("No document detected — falling back to full image OCR")
+                self.runOCR(on: cgImage, regionOfInterest: nil)
+            }
+        }
+
+        rectangleRequest.minimumConfidence = 0.8
+        rectangleRequest.minimumAspectRatio = 0.5
+        rectangleRequest.maximumAspectRatio = 1.0
+
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: .right, options: [:])
         DispatchQueue.global(qos: .userInitiated).async {
             do {
-                try handler.perform([self.detectTextRequest])
+                try handler.perform([rectangleRequest])
             } catch {
-                print("Failed to perform OCR: \(error)")
+                print("Rectangle detection failed: \(error)")
+                self.runOCR(on: cgImage, regionOfInterest: nil)
             }
         }
     }
+    
+    private func runOCR(on cgImage: CGImage, regionOfInterest: CGRect?) {
+        let request = detectTextRequest
+
+        if let roi = regionOfInterest {
+            request.regionOfInterest = roi
+        } else {
+            request.regionOfInterest = CGRect(x: 0, y: 0, width: 1, height: 1)
+        }
+
+        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: .right, options: [:])
+        DispatchQueue.global(qos: .userInitiated).async {
+            do {
+                try handler.perform([request])
+            } catch {
+                print("OCR failed: \(error)")
+            }
+        }
+    }
+
+
 }
 
 // MARK: - UITableView DataSource & Delegate

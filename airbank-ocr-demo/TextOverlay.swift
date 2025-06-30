@@ -4,6 +4,7 @@ import Vision
 final class TextOverlayView: UIView {
     private var layers = [CAShapeLayer]()
 
+    /// Draws OCR bounding box + optional text label
     func drawBoundingBox(for observation: VNRecognizedTextObservation) {
         let imageRect = bounds
 
@@ -30,6 +31,25 @@ final class TextOverlayView: UIView {
             label.font = .systemFont(ofSize: 5)
             addSubview(label)
         }
+    }
+
+    /// Draws a rectangular highlight from a normalized CGRect (e.g. detected document zone)
+    func drawBoundingBox(for normalizedRect: CGRect, color: UIColor = .green, lineWidth: CGFloat = 2.0) {
+        let rect = CGRect(
+            x: normalizedRect.origin.x * bounds.width,
+            y: (1 - normalizedRect.origin.y - normalizedRect.height) * bounds.height,
+            width: normalizedRect.width * bounds.width,
+            height: normalizedRect.height * bounds.height
+        )
+
+        let shape = CAShapeLayer()
+        shape.frame = rect
+        shape.borderColor = color.cgColor
+        shape.borderWidth = lineWidth
+        shape.opacity = 0.8
+        shape.cornerRadius = 8
+        layer.addSublayer(shape)
+        layers.append(shape)
     }
 
     func clear() {
