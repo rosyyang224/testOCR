@@ -7,14 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A37771432E127260005E6BC5 /* ImageUploadController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771422E127260005E6BC5 /* ImageUploadController.swift */; };
-		A37771452E127266005E6BC5 /* MainAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771442E127266005E6BC5 /* MainAppDelegate.swift */; };
-		A37771472E12726B005E6BC5 /* TextOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771462E12726B005E6BC5 /* TextOverlay.swift */; };
-		A37771492E127270005E6BC5 /* WindowSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */; };
 		A377714C2E12B137005E6BC5 /* StringMetric in Frameworks */ = {isa = PBXBuildFile; productRef = A377714B2E12B137005E6BC5 /* StringMetric */; };
 		A377715E2E12CA1E005E6BC5 /* TextObservationRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A377715D2E12CA1E005E6BC5 /* TextObservationRepresentable.swift */; };
 		A37771612E12CB3C005E6BC5 /* TextObservationRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = A377715D2E12CA1E005E6BC5 /* TextObservationRepresentable.swift */; };
-		DF60302223853620009AAFC8 /* RecognizedKeyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */; };
 		DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */; };
 		DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -30,13 +25,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A37771422E127260005E6BC5 /* ImageUploadController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageUploadController.swift; sourceTree = "<group>"; };
-		A37771442E127266005E6BC5 /* MainAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainAppDelegate.swift; sourceTree = "<group>"; };
-		A37771462E12726B005E6BC5 /* TextOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlay.swift; sourceTree = "<group>"; };
-		A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneCoordinator.swift; sourceTree = "<group>"; };
 		A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "airbank-ocr-demoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A377715D2E12CA1E005E6BC5 /* TextObservationRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextObservationRepresentable.swift; sourceTree = "<group>"; };
-		DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecognizedKeyValue.swift; sourceTree = "<group>"; };
 		DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "airbank-ocr-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DFAD6E902382AABE00FE14F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -44,7 +34,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A37771522E12C179005E6BC5 /* airbank-ocr-demoUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "airbank-ocr-demoUITests"; sourceTree = "<group>"; };
 		A37771622E13D07F005E6BC5 /* Models */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Models; sourceTree = "<group>"; };
 		A37771692E13D0F4005E6BC5 /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
 		A377716A2E13D0FC005E6BC5 /* Controllers */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Controllers; sourceTree = "<group>"; };
@@ -73,7 +62,6 @@
 			isa = PBXGroup;
 			children = (
 				DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */,
-				A37771522E12C179005E6BC5 /* airbank-ocr-demoUITests */,
 				DFAD6E822382AABB00FE14F7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -97,11 +85,6 @@
 				DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */,
 				DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */,
 				DFAD6E922382AABE00FE14F7 /* Info.plist */,
-				DF60302123853620009AAFC8 /* RecognizedKeyValue.swift */,
-				A37771422E127260005E6BC5 /* ImageUploadController.swift */,
-				A37771442E127266005E6BC5 /* MainAppDelegate.swift */,
-				A37771462E12726B005E6BC5 /* TextOverlay.swift */,
-				A37771482E127270005E6BC5 /* WindowSceneCoordinator.swift */,
 			);
 			path = "airbank-ocr-demo";
 			sourceTree = "<group>";
@@ -121,9 +104,6 @@
 			);
 			dependencies = (
 				A37771562E12C179005E6BC5 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				A37771522E12C179005E6BC5 /* airbank-ocr-demoUITests */,
 			);
 			name = "airbank-ocr-demoUITests";
 			packageProductDependencies = (
@@ -227,12 +207,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A37771432E127260005E6BC5 /* ImageUploadController.swift in Sources */,
-				DF60302223853620009AAFC8 /* RecognizedKeyValue.swift in Sources */,
-				A37771452E127266005E6BC5 /* MainAppDelegate.swift in Sources */,
-				A37771472E12726B005E6BC5 /* TextOverlay.swift in Sources */,
 				A377715E2E12CA1E005E6BC5 /* TextObservationRepresentable.swift in Sources */,
-				A37771492E127270005E6BC5 /* WindowSceneCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
