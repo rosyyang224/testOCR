@@ -23,7 +23,8 @@ struct MRZProcessor {
             return isLikelyMRZ && isUppercaseOnly
         }
         
-        return mrzCandidates.sorted { $0.boundingBox.minY < $1.boundingBox.minY }
+        return mrzCandidates.sorted { $0.boundingBox.minY > $1.boundingBox.minY }
+
     }
     
     /// Determines whether the grouped MRZ candidates are valid MRZ block (TD3 or TD1)
