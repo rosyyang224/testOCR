@@ -11,7 +11,12 @@ import Vision
 import Photos
 import StringMetric
 
-final class ImageUploadController: UIViewController {
+class ImageUploadController: UIViewController,
+                             UIImagePickerControllerDelegate,
+                             UINavigationControllerDelegate,
+                             UITableViewDelegate {
+
+
     private let imagePicker = UIImagePickerController()
     private let overlayView = TextOverlayView()
     private var recognizedKeyValuePairs: [RecognizedKeyValue] = []
@@ -232,3 +237,21 @@ final class ImageUploadController: UIViewController {
         }
     }
 }
+
+// MARK: - UITableViewDataSource
+
+extension ImageUploadController: UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return recognizedKeyValuePairs.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: KeyValueTableViewCell.identifier, for: indexPath) as? KeyValueTableViewCell else {
+            return UITableViewCell()
+        }
+        let pair = recognizedKeyValuePairs[indexPath.row]
+        cell.configure(key: pair.key, value: pair.value ?? "—")
+        return cell
+    }
+}
+
