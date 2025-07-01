@@ -9,6 +9,21 @@
 
 import UIKit
 
+final class DocumentResultHeader: UILabel {
+    override init(frame: CGRect = .zero) {
+        super.init(frame: frame)
+        font = UIFont.boldSystemFont(ofSize: 18)
+        textColor = .darkText
+        textAlignment = .left
+        numberOfLines = 1
+        translatesAutoresizingMaskIntoConstraints = false
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
 final class ResultCardView: UIView {
 
     let documentTypeLabel = DocumentResultHeader()

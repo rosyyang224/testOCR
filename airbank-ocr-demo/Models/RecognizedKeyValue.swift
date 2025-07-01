@@ -1,13 +1,12 @@
 //
-//  RecognizedKeyValue.swift
+//  RecognizedKeyValue 2.swift
 //  airbank-ocr-demo
 //
-//  Created by Rosemary Yang on 7/1/25.
+//  Created by Rosemary Yang on 7/2/25.
 //  Copyright © 2025 Marek Přidal. All rights reserved.
 //
 
 
-import Foundation
 import Vision
 
 struct RecognizedKeyValue {
@@ -80,4 +79,9 @@ struct RecognizedKeyValue {
         self.valueTextObservation = valueTextObservation
     }
 
+}
+
+struct RecognizedWord {
+    let text: String
+    let boundingBox: CGRect
 }
