@@ -17,6 +17,8 @@ final class DocumentResultHeader: UILabel {
         textColor = .label
         numberOfLines = 2
         lineBreakMode = .byTruncatingTail
+        setContentHuggingPriority(.required, for: .vertical)
+        setContentCompressionResistancePriority(.required, for: .vertical)
         translatesAutoresizingMaskIntoConstraints = false
     }
 

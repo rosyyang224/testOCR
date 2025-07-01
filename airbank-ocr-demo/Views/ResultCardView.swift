@@ -51,6 +51,9 @@ final class ResultCardView: UIView {
         tableView.layer.cornerRadius = 12
         tableView.isHidden = true
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        documentTypeLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        documentTypeLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
 
         let stack = UIStackView(arrangedSubviews: [documentTypeLabel, imagePreview, tableView])
         stack.axis = .vertical
