@@ -143,7 +143,14 @@ final class DocumentResultViewController: UIViewController, UITableViewDelegate,
 
     private func handleTextRecognition(request: VNRequest?, error: Error?) {
         guard error == nil, let results = request?.results as? [VNRecognizedTextObservation] else { return }
-
+        
+//        print("📝 RAW OCR RESULTS:")
+//            for obs in results {
+//                if let topCandidate = obs.topCandidates(1).first {
+//                    print("• \"\(topCandidate.string)\" — box: \(obs.boundingBox)")
+//                }
+//            }
+        
         let recognizedWords = results.compactMap { obs in
             obs.topCandidates(1).first.map {
                 RecognizedWord(text: $0.string.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), boundingBox: obs.boundingBox)
@@ -158,17 +165,20 @@ final class DocumentResultViewController: UIViewController, UITableViewDelegate,
            let parsed = PassportMRZParser.parse(lines: parsedLines.map { $0.text }) {
             detectedDocumentType = "Passport (MRZ)"
             keyValuePairs = [
-                .init(key: "SURNAME", value: parsed.surname),
-                .init(key: "GIVEN NAMES", value: parsed.givenNames),
-                .init(key: "PASSPORT NO", value: parsed.passportNumber),
-                .init(key: "DATE OF BIRTH", value: parsed.dateOfBirth),
-                .init(key: "NATIONALITY", value: parsed.nationality),
-                .init(key: "SEX", value: parsed.sex),
-                .init(key: "DATE OF EXPIRY", value: parsed.expirationDate)
+                .init(key: "SURNAME", value: parsed.surname, keyTextObservation: nil, valueTextObservation: nil),
+                .init(key: "GIVEN NAMES", value: parsed.givenNames, keyTextObservation: nil, valueTextObservation: nil),
+                .init(key: "PASSPORT NO", value: parsed.passportNumber, keyTextObservation: nil, valueTextObservation: nil),
+                .init(key: "DATE OF BIRTH", value: parsed.dateOfBirth, keyTextObservation: nil, valueTextObservation: nil),
+                .init(key: "NATIONALITY", value: parsed.nationality, keyTextObservation: nil, valueTextObservation: nil),
+                .init(key: "SEX", value: parsed.sex, keyTextObservation: nil, valueTextObservation: nil),
+                .init(key: "DATE OF EXPIRY", value: parsed.expirationDate, keyTextObservation: nil, valueTextObservation: nil)
             ]
         } else {
             detectedDocumentType = "ID Card"
-            keyValuePairs = IDCardFieldExtractor.extractKeyValuePairs(from: results)
+            let normalizedLines = IDCardLayoutHelper.normalizeObservations(results)
+            keyValuePairs = IDCardFieldExtractor.extractKeyValuePairs(from: normalizedLines)
+            print("🔎 Extracted \(keyValuePairs.count) key-value pairs")
+
         }
 
         DispatchQueue.main.async {
