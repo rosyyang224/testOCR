@@ -6,7 +6,6 @@
 //  Copyright © 2025 Marek Přidal. All rights reserved.
 //
 
-
 import UIKit
 import Vision
 import Photos
@@ -18,6 +17,7 @@ final class ImageUploadController: UIViewController {
     private var recognizedKeyValuePairs: [RecognizedKeyValue] = []
     private var currentImage: UIImage?
     private var isImageVisible: Bool = true
+    private var detectedDocumentType: String? = nil
 
     private lazy var detectTextRequest: VNRecognizeTextRequest = {
         let request = VNRecognizeTextRequest(completionHandler: handleTextRecognition)
@@ -30,6 +30,14 @@ final class ImageUploadController: UIViewController {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         return iv
+    }()
+
+    private lazy var documentTypeLabel: UILabel = {
+        let label = UILabel()
+        label.textAlignment = .center
+        label.font = UIFont.boldSystemFont(ofSize: 16)
+        label.textColor = .systemBlue
+        return label
     }()
 
     private func updateOverlayFrame(for image: UIImage) {
@@ -73,7 +81,7 @@ final class ImageUploadController: UIViewController {
     }
 
     private func setupUI() {
-        let stackView = UIStackView(arrangedSubviews: [imagePreview, keyValueTableView, uploadButton])
+        let stackView = UIStackView(arrangedSubviews: [documentTypeLabel, imagePreview, keyValueTableView, uploadButton])
         stackView.axis = .vertical
         stackView.spacing = 20
         stackView.alignment = .fill
@@ -152,13 +160,6 @@ final class ImageUploadController: UIViewController {
             return
         }
 
-        print("🔍 Raw OCR Results:")
-        for observation in results {
-            if let text = observation.topCandidates(1).first?.string {
-                print("• \"\(text)\" — box: \(observation.boundingBox)")
-            }
-        }
-
         let recognizedWords = results.compactMap { obs -> RecognizedWord? in
             guard let text = obs.topCandidates(1).first?.string else { return nil }
             return RecognizedWord(text: text.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), boundingBox: obs.boundingBox)
@@ -167,12 +168,32 @@ final class ImageUploadController: UIViewController {
         let mrzLines = MRZProcessor.detectMRZLines(from: recognizedWords)
         let useMRZ = MRZProcessor.isLikelyMRZBlock(mrzLines)
 
-        let keyValuePairs = useMRZ ? [] : IDCardFieldExtractor.extractKeyValuePairs(from: results)
+        var keyValuePairs: [RecognizedKeyValue] = []
+
+        if useMRZ {
+            detectedDocumentType = "Passport (MRZ)"
+            let lineTexts = mrzLines.map { $0.text }
+            if let parsed = PassportMRZParser.parse(lines: lineTexts) {
+                keyValuePairs = [
+                    RecognizedKeyValue(key: "SURNAME", keyTextObservation: nil, value: parsed.surname, valueTextObservation: nil),
+                    RecognizedKeyValue(key: "GIVEN NAMES", keyTextObservation: nil, value: parsed.givenNames, valueTextObservation: nil),
+                    RecognizedKeyValue(key: "PASSPORT NO", keyTextObservation: nil, value: parsed.passportNumber, valueTextObservation: nil),
+                    RecognizedKeyValue(key: "DATE OF BIRTH", keyTextObservation: nil, value: parsed.dateOfBirth, valueTextObservation: nil),
+                    RecognizedKeyValue(key: "NATIONALITY", keyTextObservation: nil, value: parsed.nationality, valueTextObservation: nil),
+                    RecognizedKeyValue(key: "SEX", keyTextObservation: nil, value: parsed.sex, valueTextObservation: nil),
+                    RecognizedKeyValue(key: "DATE OF EXPIRY", keyTextObservation: nil, value: parsed.expirationDate, valueTextObservation: nil)
+                ]
+            }
+        } else {
+            detectedDocumentType = "ID Card"
+            keyValuePairs = IDCardFieldExtractor.extractKeyValuePairs(from: results)
+        }
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             self.overlayView.clear()
             results.forEach { self.overlayView.drawBoundingBox(for: $0) }
+            self.documentTypeLabel.text = "Detected: \(self.detectedDocumentType ?? "Unknown")"
             self.recognizedKeyValuePairs = keyValuePairs
             self.keyValueTableView.isHidden = keyValuePairs.isEmpty
             self.keyValueTableView.reloadData()
@@ -181,10 +202,8 @@ final class ImageUploadController: UIViewController {
 
     private func processImage(_ image: UIImage) {
         guard let cgImage = image.cgImage else { return }
-
         let rectangleRequest = VNDetectRectanglesRequest { [weak self] request, error in
             guard let self = self else { return }
-
             if let rectObservation = request.results?.first as? VNRectangleObservation {
                 print("Detected document rectangle")
                 DispatchQueue.main.async {
@@ -196,122 +215,20 @@ final class ImageUploadController: UIViewController {
                 self.runOCR(on: cgImage, regionOfInterest: nil)
             }
         }
-
         rectangleRequest.minimumConfidence = 0.8
         rectangleRequest.minimumAspectRatio = 0.5
         rectangleRequest.maximumAspectRatio = 1.0
-
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: .right, options: [:])
         DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                try handler.perform([rectangleRequest])
-            } catch {
-                print("Rectangle detection failed: \(error)")
-                self.runOCR(on: cgImage, regionOfInterest: nil)
-            }
+            try? handler.perform([rectangleRequest])
         }
     }
 
     private func runOCR(on cgImage: CGImage, regionOfInterest: CGRect?) {
-        if let roi = regionOfInterest {
-            detectTextRequest.regionOfInterest = roi
-        } else {
-            detectTextRequest.regionOfInterest = CGRect(x: 0, y: 0, width: 1, height: 1)
-        }
-
+        detectTextRequest.regionOfInterest = regionOfInterest ?? CGRect(x: 0, y: 0, width: 1, height: 1)
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: .right, options: [:])
         DispatchQueue.global(qos: .userInitiated).async {
-            do {
-                try handler.perform([self.detectTextRequest])
-            } catch {
-                print("OCR failed: \(error)")
-            }
+            try? handler.perform([self.detectTextRequest])
         }
-    }
-}
-
-// MARK: - UITableView DataSource & Delegate
-extension ImageUploadController: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return recognizedKeyValuePairs.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "KeyValueCell", for: indexPath) as! KeyValueTableViewCell
-        let pair = recognizedKeyValuePairs[indexPath.row]
-        cell.configure(key: pair.key, value: pair.value ?? "")
-        return cell
-    }
-
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return recognizedKeyValuePairs.isEmpty ? nil : "Recognized Key-Value Pairs"
-    }
-}
-
-extension ImageUploadController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true)
-    }
-
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        dismiss(animated: true)
-        guard let image = info[.originalImage] as? UIImage else { return }
-
-        navigationItem.rightBarButtonItem?.isEnabled = true
-        currentImage = image
-        imagePreview.image = image
-        updateOverlayFrame(for: image)
-        isImageVisible = true
-        navigationItem.rightBarButtonItem?.title = "Hide Image"
-        processImage(image)
-    }
-}
-
-// MARK: - Custom Table View Cell
-class KeyValueTableViewCell: UITableViewCell {
-    private let keyLabel = UILabel()
-    private let valueLabel = UILabel()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setupUI()
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    private func setupUI() {
-        keyLabel.font = UIFont.boldSystemFont(ofSize: 14)
-        keyLabel.textColor = .label
-        keyLabel.numberOfLines = 0
-
-        valueLabel.font = UIFont.systemFont(ofSize: 14)
-        valueLabel.textColor = .secondaryLabel
-        valueLabel.numberOfLines = 0
-
-        let stackView = UIStackView(arrangedSubviews: [keyLabel, valueLabel])
-        stackView.axis = .horizontal
-        stackView.spacing = 12
-        stackView.alignment = .top
-        stackView.distribution = .fill
-
-        keyLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        keyLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(stackView)
-
-        NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)
-        ])
-    }
-
-    func configure(key: String, value: String) {
-        keyLabel.text = key
-        valueLabel.text = value
     }
 }
