@@ -1,25 +1,19 @@
-//
-//  DocumentResultViewController.swift
-//  airbank-ocr-demo
-//
-//  Created by Rosemary Yang on 7/1/25.
-//  Copyright © 2025 Marek Přidal. All rights reserved.
-//
-
-
 import UIKit
 import Vision
 import AVFoundation
 import StringMetric
 
-final class DocumentResultViewController: UIViewController,
-                                          UITableViewDelegate,
-                                          UITableViewDataSource {
-    
+final class DocumentResultViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+
+    // MARK: - Properties
     private var currentImage: UIImage?
     private var isImageVisible: Bool = true
     private var recognizedKeyValuePairs: [RecognizedKeyValue] = []
-    private var detectedDocumentType: String? = nil
+    private var detectedDocumentType: String?
+
+    // MARK: - UI Components
+    private let resultCardView = ResultCardView()
+    private let scanAgainButton = ScanAgainButton()
 
     private lazy var detectTextRequest: VNRecognizeTextRequest = {
         let request = VNRecognizeTextRequest(completionHandler: handleTextRecognition)
@@ -28,38 +22,25 @@ final class DocumentResultViewController: UIViewController,
         return request
     }()
 
-    private lazy var imagePreview: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFit
-        return iv
-    }()
-
-    private let overlayView = TextOverlayView()
-
-    private lazy var documentTypeLabel: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        label.font = UIFont.boldSystemFont(ofSize: 16)
-        label.textColor = .systemBlue
-        return label
-    }()
-
-    private lazy var keyValueTableView: UITableView = {
-        let tableView = UITableView()
-        tableView.register(KeyValueTableViewCell.self, forCellReuseIdentifier: KeyValueTableViewCell.identifier)
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 44
-        tableView.isHidden = true
-        return tableView
-    }()
-
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = AppTheme.backgroundColor
         setupUI()
         setupNavBar()
+        resultCardView.tableView.delegate = self
+        resultCardView.tableView.dataSource = self
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        tabBarController?.tabBar.isHidden = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        tabBarController?.tabBar.isHidden = false
     }
 
     override func viewDidLayoutSubviews() {
@@ -69,70 +50,62 @@ final class DocumentResultViewController: UIViewController,
         }
     }
 
+    // MARK: - Public
     func loadImage(_ image: UIImage) {
         currentImage = image
-        imagePreview.image = image
+        resultCardView.imagePreview.image = image
         navigationItem.rightBarButtonItem?.isEnabled = true
         processImage(image)
     }
-    
+
+    // MARK: - Setup
     private func setupNavBar() {
-        let toggleButton = UIBarButtonItem(title: "Hide Image", style: .plain, target: self, action: #selector(toggleImageVisibility))
-        toggleButton.isEnabled = false
+        let toggleButton = UIBarButtonItem(title: isImageVisible ? "Hide Image" : "Show Image",
+                                           style: .plain,
+                                           target: self,
+                                           action: #selector(toggleImageVisibility))
+        toggleButton.tintColor = AppTheme.primaryColor
         navigationItem.rightBarButtonItem = toggleButton
     }
 
     private func setupUI() {
-        view.addSubview(documentTypeLabel)
-        view.addSubview(imagePreview)
-        view.addSubview(keyValueTableView)
-        imagePreview.addSubview(overlayView)
+        view.addSubview(resultCardView)
+        view.addSubview(scanAgainButton)
 
-        documentTypeLabel.translatesAutoresizingMaskIntoConstraints = false
-        imagePreview.translatesAutoresizingMaskIntoConstraints = false
-        overlayView.translatesAutoresizingMaskIntoConstraints = false
-        keyValueTableView.translatesAutoresizingMaskIntoConstraints = false
+        resultCardView.translatesAutoresizingMaskIntoConstraints = false
+        scanAgainButton.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            documentTypeLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            documentTypeLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            documentTypeLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            resultCardView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            resultCardView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            resultCardView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
-            imagePreview.topAnchor.constraint(equalTo: documentTypeLabel.bottomAnchor, constant: 16),
-            imagePreview.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            imagePreview.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            imagePreview.heightAnchor.constraint(equalToConstant: 250),
-
-            overlayView.topAnchor.constraint(equalTo: imagePreview.topAnchor),
-            overlayView.bottomAnchor.constraint(equalTo: imagePreview.bottomAnchor),
-            overlayView.leadingAnchor.constraint(equalTo: imagePreview.leadingAnchor),
-            overlayView.trailingAnchor.constraint(equalTo: imagePreview.trailingAnchor),
-
-            keyValueTableView.topAnchor.constraint(equalTo: imagePreview.bottomAnchor, constant: 16),
-            keyValueTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            keyValueTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            keyValueTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            keyValueTableView.heightAnchor.constraint(greaterThanOrEqualToConstant: 200)
+            scanAgainButton.topAnchor.constraint(equalTo: resultCardView.bottomAnchor, constant: 20),
+            scanAgainButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
+            scanAgainButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
+            scanAgainButton.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
+
+        scanAgainButton.addTarget(self, action: #selector(scanAnother), for: .touchUpInside)
     }
 
-
+    // MARK: - Actions
     @objc private func toggleImageVisibility() {
         isImageVisible.toggle()
-        if isImageVisible {
-            imagePreview.image = currentImage
-            navigationItem.rightBarButtonItem?.title = "Hide Image"
-        } else {
-            imagePreview.image = nil
-            navigationItem.rightBarButtonItem?.title = "Show Image"
-        }
+        resultCardView.imagePreview.image = isImageVisible ? currentImage : nil
+        navigationItem.rightBarButtonItem?.title = isImageVisible ? "Hide Image" : "Show Image"
     }
 
+    @objc private func scanAnother() {
+        navigationController?.popViewController(animated: true)
+    }
+
+    // MARK: - OCR Processing
     private func updateOverlayFrame(for image: UIImage) {
         let imageSize = image.size
-        let imageViewSize = imagePreview.bounds.size
+        let imageViewSize = resultCardView.imagePreview.bounds.size
         let rect = AVMakeRect(aspectRatio: imageSize, insideRect: CGRect(origin: .zero, size: imageViewSize))
-        overlayView.frame = rect
+        resultCardView.overlayView.frame = rect
     }
 
     private func processImage(_ image: UIImage) {
@@ -142,7 +115,7 @@ final class DocumentResultViewController: UIViewController,
             guard let self = self else { return }
             if let rect = request.results?.first as? VNRectangleObservation {
                 DispatchQueue.main.async {
-                    self.overlayView.drawBoundingBox(for: rect.boundingBox, color: .green, lineWidth: 2.0)
+                    self.resultCardView.overlayView.drawBoundingBox(for: rect.boundingBox, color: .green, lineWidth: 2.0)
                 }
                 self.runOCR(on: cgImage, regionOfInterest: rect.boundingBox)
             } else {
@@ -161,7 +134,6 @@ final class DocumentResultViewController: UIViewController,
     }
 
     private func runOCR(on cgImage: CGImage, regionOfInterest: CGRect?) {
-        print("Running OCR in region: \(detectTextRequest.regionOfInterest)")
         detectTextRequest.regionOfInterest = regionOfInterest ?? CGRect(x: 0, y: 0, width: 1, height: 1)
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: .right, options: [:])
         DispatchQueue.global(qos: .userInitiated).async {
@@ -170,81 +142,60 @@ final class DocumentResultViewController: UIViewController,
     }
 
     private func handleTextRecognition(request: VNRequest?, error: Error?) {
-        guard error == nil, let results = request?.results as? [VNRecognizedTextObservation] else {
-            print("OCR error or no results.")
-            return
-        }
+        guard error == nil, let results = request?.results as? [VNRecognizedTextObservation] else { return }
 
-        let recognizedWords = results.compactMap { obs -> RecognizedWord? in
-            guard let text = obs.topCandidates(1).first?.string else { return nil }
-            return RecognizedWord(text: text.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), boundingBox: obs.boundingBox)
+        let recognizedWords = results.compactMap { obs in
+            obs.topCandidates(1).first.map {
+                RecognizedWord(text: $0.string.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(), boundingBox: obs.boundingBox)
+            }
         }
 
         let mrzLines = MRZProcessor.detectMRZLines(from: recognizedWords)
-        if let mrzLines = MRZProcessor.detectAndPrintMRZ(from: recognizedWords),
-           MRZProcessor.isLikelyMRZBlock(mrzLines) {
-            
-            detectedDocumentType = "Passport (MRZ)"
-            let lineTexts = mrzLines.map { $0.text }
-            
-            if let parsed = PassportMRZParser.parse(lines: lineTexts) {
-                let keyValuePairs = [
-                    RecognizedKeyValue(key: "SURNAME", keyTextObservation: nil, value: parsed.surname, valueTextObservation: nil),
-                    // ... other fields ...
-                ]
-                
-                DispatchQueue.main.async {
-                    self.documentTypeLabel.text = "Detected: Passport"
-                    self.recognizedKeyValuePairs = keyValuePairs
-                }
-            }
-        }
-
-
-        let useMRZ = MRZProcessor.isLikelyMRZBlock(mrzLines)
-
         var keyValuePairs: [RecognizedKeyValue] = []
 
-        if useMRZ {
+        if let parsedLines = MRZProcessor.detectAndPrintMRZ(from: recognizedWords),
+           MRZProcessor.isLikelyMRZBlock(parsedLines),
+           let parsed = PassportMRZParser.parse(lines: parsedLines.map { $0.text }) {
             detectedDocumentType = "Passport (MRZ)"
-            let lineTexts = mrzLines.map { $0.text }
-            if let parsed = PassportMRZParser.parse(lines: lineTexts) {
-                keyValuePairs = [
-                    RecognizedKeyValue(key: "SURNAME", keyTextObservation: nil, value: parsed.surname, valueTextObservation: nil),
-                    RecognizedKeyValue(key: "GIVEN NAMES", keyTextObservation: nil, value: parsed.givenNames, valueTextObservation: nil),
-                    RecognizedKeyValue(key: "PASSPORT NO", keyTextObservation: nil, value: parsed.passportNumber, valueTextObservation: nil),
-                    RecognizedKeyValue(key: "DATE OF BIRTH", keyTextObservation: nil, value: parsed.dateOfBirth, valueTextObservation: nil),
-                    RecognizedKeyValue(key: "NATIONALITY", keyTextObservation: nil, value: parsed.nationality, valueTextObservation: nil),
-                    RecognizedKeyValue(key: "SEX", keyTextObservation: nil, value: parsed.sex, valueTextObservation: nil),
-                    RecognizedKeyValue(key: "DATE OF EXPIRY", keyTextObservation: nil, value: parsed.expirationDate, valueTextObservation: nil)
-                ]
-            }
+            keyValuePairs = [
+                .init(key: "SURNAME", value: parsed.surname),
+                .init(key: "GIVEN NAMES", value: parsed.givenNames),
+                .init(key: "PASSPORT NO", value: parsed.passportNumber),
+                .init(key: "DATE OF BIRTH", value: parsed.dateOfBirth),
+                .init(key: "NATIONALITY", value: parsed.nationality),
+                .init(key: "SEX", value: parsed.sex),
+                .init(key: "DATE OF EXPIRY", value: parsed.expirationDate)
+            ]
         } else {
             detectedDocumentType = "ID Card"
             keyValuePairs = IDCardFieldExtractor.extractKeyValuePairs(from: results)
         }
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.overlayView.clear()
-            results.forEach { self.overlayView.drawBoundingBox(for: $0) }
-            self.documentTypeLabel.text = "Detected: \(self.detectedDocumentType ?? "Unknown")"
+        DispatchQueue.main.async {
+            self.resultCardView.overlayView.clear()
+            results.forEach { self.resultCardView.overlayView.drawBoundingBox(for: $0) }
+
+            self.detectedDocumentType = self.detectedDocumentType ?? "Unknown"
             self.recognizedKeyValuePairs = keyValuePairs
-            self.keyValueTableView.isHidden = keyValuePairs.isEmpty
-            print("Reloading table with \(self.recognizedKeyValuePairs.count) rows")
-            self.keyValueTableView.reloadData()
+            self.resultCardView.documentTypeLabel.text = "Detected: \(self.detectedDocumentType!)"
+            self.resultCardView.tableView.isHidden = keyValuePairs.isEmpty
+            self.resultCardView.tableView.reloadData()
+            
+            let rowHeight: CGFloat = 44
+            let spacing: CGFloat = 12
+            let totalHeight = CGFloat(keyValuePairs.count) * rowHeight + spacing
+            self.resultCardView.tableHeightConstraint.constant = totalHeight
+
         }
     }
 
-    // MARK: - TableView
-
+    // MARK: - UITableView
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return recognizedKeyValuePairs.count
+        recognizedKeyValuePairs.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: KeyValueTableViewCell.identifier,
-                                                       for: indexPath) as? KeyValueTableViewCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: KeyValueTableViewCell.identifier, for: indexPath) as? KeyValueTableViewCell else {
             return UITableViewCell()
         }
         let pair = recognizedKeyValuePairs[indexPath.row]

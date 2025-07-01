@@ -8,21 +8,30 @@ final class HomeViewController: UIViewController {
     private let mainCardView = HomeMainCardView()
     private let quickActionsView = HomeQuickActionsView()
 
+    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = AppTheme.backgroundColor
         setupUI()
         setupConstraints()
         setupActions()
+        if let scrollView = view.subviews.first(where: { $0 is UIScrollView }) as? UIScrollView {
+            scrollView.contentInsetAdjustmentBehavior = .automatic
+        }
+        
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(true, animated: animated)
+        // Hides nav bar for clean Home screen; DocumentResultController will unhide it
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
 
-    private func setupUI() {
-        view.backgroundColor = AppTheme.backgroundColor
+    // MARK: - UI Setup
 
+    private func setupUI() {
+        view.clipsToBounds = true
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
@@ -36,13 +45,13 @@ final class HomeViewController: UIViewController {
 
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // ScrollView
+            // Scroll View
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-            // ContentView
+            // Content View
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
@@ -54,7 +63,7 @@ final class HomeViewController: UIViewController {
             headerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
             headerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
 
-            // Main card
+            // Main Card
             mainCardView.topAnchor.constraint(equalTo: headerView.bottomAnchor, constant: 32),
             mainCardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
             mainCardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
@@ -72,15 +81,19 @@ final class HomeViewController: UIViewController {
         quickActionsView.historyButton.addTarget(self, action: #selector(historyTapped), for: .touchUpInside)
     }
 
+    // MARK: - Actions
+
     @objc private func scanTapped() {
         presentPickerOptions()
     }
-    
+
     @objc private func historyTapped() {
         print("View History tapped")
         // TODO: Push history screen
     }
 }
+
+// MARK: - UIImagePickerControllerDelegate
 
 extension HomeViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     private func presentPickerOptions() {
@@ -105,6 +118,7 @@ extension HomeViewController: UIImagePickerControllerDelegate, UINavigationContr
 
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 
+        // Required for iPad to avoid crash
         if let popover = alert.popoverPresentationController {
             popover.sourceView = self.view
             popover.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
@@ -114,7 +128,7 @@ extension HomeViewController: UIImagePickerControllerDelegate, UINavigationContr
         present(alert, animated: true)
     }
 
-    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true)
 
         guard let image = info[.originalImage] as? UIImage else { return }
@@ -124,7 +138,7 @@ extension HomeViewController: UIImagePickerControllerDelegate, UINavigationContr
         navigationController?.pushViewController(controller, animated: true)
     }
 
-    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true)
     }
 }
