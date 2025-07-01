@@ -45,6 +45,9 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A37771522E12C179005E6BC5 /* airbank-ocr-demoUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "airbank-ocr-demoUITests"; sourceTree = "<group>"; };
+		A37771622E13D07F005E6BC5 /* Models */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Models; sourceTree = "<group>"; };
+		A37771692E13D0F4005E6BC5 /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
+		A377716A2E13D0FC005E6BC5 /* Controllers */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Controllers; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +90,9 @@
 		DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */ = {
 			isa = PBXGroup;
 			children = (
+				A377716A2E13D0FC005E6BC5 /* Controllers */,
+				A37771692E13D0F4005E6BC5 /* Views */,
+				A37771622E13D07F005E6BC5 /* Models */,
 				A377715D2E12CA1E005E6BC5 /* TextObservationRepresentable.swift */,
 				DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */,
 				DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */,
@@ -137,6 +143,11 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A37771622E13D07F005E6BC5 /* Models */,
+				A37771692E13D0F4005E6BC5 /* Views */,
+				A377716A2E13D0FC005E6BC5 /* Controllers */,
 			);
 			name = "airbank-ocr-demo";
 			productName = "airbank-ocr-demo";

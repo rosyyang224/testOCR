@@ -2,9 +2,10 @@
 //  RecognizedKeyValue.swift
 //  airbank-ocr-demo
 //
-//  Created by Marek Přidal on 20/11/2019.
-//  Copyright © 2019 Marek Přidal. All rights reserved.
+//  Created by Rosemary Yang on 7/1/25.
+//  Copyright © 2025 Marek Přidal. All rights reserved.
 //
+
 
 import Foundation
 import Vision
@@ -25,10 +26,6 @@ struct RecognizedKeyValue {
         case dateOfIssue = "DATE OF ISSUE"
         case dateOfExpiry = "DATE OF EXPIRY"
         case sex = "SEX"
-        
-        static var allKeywords: Set<String> {
-            Set(Self.allCases.flatMap { $0.keywords.map { $0.uppercased() } })
-        }
 
         var keywords: [String] {
             switch self {
@@ -52,29 +49,26 @@ struct RecognizedKeyValue {
                 return ["SEX", "GENDER"]
             }
         }
-    }
-    
-//    let key: String
-//    let keyTextObservation: VNRecognizedTextObservation
-    let key: String
-    let keyTextObservation: VNRecognizedTextObservation? // ← optional
-    let value: String?
-    let valueTextObservation: VNRecognizedTextObservation? // ← optional
-    
-//    var keyPosition: VNRectangleObservation? {
-//        try? keyTextObservation.topCandidates(10).first(where: { $0.string == key })?.boundingBox(for: Range<String.Index>.init(uncheckedBounds: (key.startIndex, key.endIndex)))
-//    }
-    var keyPosition: VNRectangleObservation? {
-        guard let obs = keyTextObservation else { return nil }
-        return try? obs
-            .topCandidates(10)
-            .first(where: { $0.string == key })?
-            .boundingBox(for: key.startIndex..<key.endIndex)
+
+        static var allKeywords: Set<String> {
+            Set(allCases.flatMap { $0.keywords.map { $0.uppercased() } })
+        }
     }
 
+    let key: String
+    let keyTextObservation: VNRecognizedTextObservation?
+    let value: String?
+    let valueTextObservation: VNRecognizedTextObservation?
+
     var alignment: Alignment {
-        key.contains("SURNAME") || key.contains("GIVEN NAMES") || key.contains("DOCUMENT NO.") ? .horizontal : .vertical
+        switch key.uppercased() {
+        case "SURNAME", "GIVEN NAMES", "DOCUMENT NO.":
+            return .horizontal
+        default:
+            return .vertical
+        }
     }
+
     var documentElement: DocumentElement? {
         DocumentElement(rawValue: key)
     }
