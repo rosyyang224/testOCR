@@ -17,10 +17,11 @@ class WindowSceneCoordinator: UIResponder, UIWindowSceneDelegate {
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
     ) {
+        AppTheme.apply()
         guard let windowScene = scene as? UIWindowScene else { return }
 
         window = UIWindow(windowScene: windowScene)
-        let rootVC = ImageUploadController()
+        let rootVC = HomeViewController()
         let navController = UINavigationController(rootViewController: rootVC)
         navController.tabBarItem = UITabBarItem(title: "Upload", image: UIImage(systemName: "photo"), selectedImage: UIImage(systemName: "photo.fill"))
 
@@ -30,4 +31,5 @@ class WindowSceneCoordinator: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = tabController
         window?.makeKeyAndVisible()
     }
+
 }
