@@ -11,7 +11,6 @@
 import UIKit
 
 final class HomeQuickActionsView: UIStackView {
-    let uploadButton = UIButton(type: .system)
     let historyButton = UIButton(type: .system)
 
     override init(frame: CGRect) {
@@ -27,10 +26,6 @@ final class HomeQuickActionsView: UIStackView {
     }
 
     private func setupButtons() {
-        uploadButton.setTitle("📁 Upload from Gallery", for: .normal)
-        AppTheme.styleSecondaryButton(uploadButton)
-        addArrangedSubview(uploadButton)
-
         historyButton.setTitle("📋 Recent Scans", for: .normal)
         AppTheme.styleSecondaryButton(historyButton)
         addArrangedSubview(historyButton)
