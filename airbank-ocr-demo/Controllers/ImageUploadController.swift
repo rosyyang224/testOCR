@@ -2,8 +2,7 @@
 //  ImageUploadController.swift
 //  airbank-ocr-demo
 //
-//  Created by Rosemary Yang on 7/1/25.
-//  Copyright © 2025 Marek Přidal. All rights reserved.
+//  Refactored to match master branch behavior
 //
 
 import UIKit
@@ -14,8 +13,8 @@ import StringMetric
 class ImageUploadController: UIViewController,
                              UIImagePickerControllerDelegate,
                              UINavigationControllerDelegate,
-                             UITableViewDelegate {
-
+                             UITableViewDelegate,
+                             UITableViewDataSource {
 
     private let imagePicker = UIImagePickerController()
     private let overlayView = TextOverlayView()
@@ -45,20 +44,6 @@ class ImageUploadController: UIViewController,
         return label
     }()
 
-    private func updateOverlayFrame(for image: UIImage) {
-        let imageSize = image.size
-        let imageViewSize = imagePreview.bounds.size
-        let rect = AVMakeRect(aspectRatio: imageSize, insideRect: CGRect(origin: .zero, size: imageViewSize))
-        overlayView.frame = rect
-    }
-
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        if let image = currentImage, isImageVisible {
-            updateOverlayFrame(for: image)
-        }
-    }
-
     private lazy var uploadButton: UIButton = {
         let button = UIButton(type: .roundedRect)
         button.setTitle("Upload Photo", for: .normal)
@@ -68,7 +53,7 @@ class ImageUploadController: UIViewController,
 
     private lazy var keyValueTableView: UITableView = {
         let tableView = UITableView()
-        tableView.register(KeyValueTableViewCell.self, forCellReuseIdentifier: "KeyValueCell")
+        tableView.register(KeyValueTableViewCell.self, forCellReuseIdentifier: KeyValueTableViewCell.identifier)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.rowHeight = UITableView.automaticDimension
@@ -85,12 +70,18 @@ class ImageUploadController: UIViewController,
         setupNavBar()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        if let image = currentImage, isImageVisible {
+            updateOverlayFrame(for: image)
+        }
+    }
+
     private func setupUI() {
         let stackView = UIStackView(arrangedSubviews: [documentTypeLabel, imagePreview, keyValueTableView, uploadButton])
         stackView.axis = .vertical
         stackView.spacing = 20
         stackView.alignment = .fill
-        stackView.distribution = .fill
         stackView.translatesAutoresizingMaskIntoConstraints = false
 
         imagePreview.addSubview(overlayView)
@@ -98,27 +89,24 @@ class ImageUploadController: UIViewController,
 
         view.addSubview(stackView)
 
-        let flexibleHeightConstraint = imagePreview.heightAnchor.constraint(equalTo: imagePreview.widthAnchor, multiplier: 1.5)
-        flexibleHeightConstraint.priority = .defaultHigh
-
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             stackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             stackView.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-            flexibleHeightConstraint,
+
             imagePreview.heightAnchor.constraint(greaterThanOrEqualToConstant: 150),
             imagePreview.heightAnchor.constraint(lessThanOrEqualToConstant: 300),
+
             overlayView.topAnchor.constraint(equalTo: imagePreview.topAnchor),
             overlayView.bottomAnchor.constraint(equalTo: imagePreview.bottomAnchor),
             overlayView.leadingAnchor.constraint(equalTo: imagePreview.leadingAnchor),
             overlayView.trailingAnchor.constraint(equalTo: imagePreview.trailingAnchor),
+
             uploadButton.heightAnchor.constraint(equalToConstant: 50)
         ])
 
         imagePreview.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-        keyValueTableView.setContentCompressionResistancePriority(.required, for: .vertical)
-        uploadButton.setContentCompressionResistancePriority(.required, for: .vertical)
     }
 
     private func setupNavBar() {
@@ -144,19 +132,48 @@ class ImageUploadController: UIViewController,
         if let album = pickerOption(for: .savedPhotosAlbum, title: "Photo Album") { alert.addAction(album) }
         if let library = pickerOption(for: .photoLibrary, title: "Photo Library") { alert.addAction(library) }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
         if UIDevice.current.userInterfaceIdiom == .pad {
             alert.popoverPresentationController?.sourceView = view
             alert.popoverPresentationController?.sourceRect = view.bounds
         }
-        present(alert, animated: true)
+
+        DispatchQueue.main.async {
+            self.present(alert, animated: true)
+        }
     }
 
     private func pickerOption(for type: UIImagePickerController.SourceType, title: String) -> UIAlertAction? {
         guard UIImagePickerController.isSourceTypeAvailable(type) else { return nil }
         return UIAlertAction(title: title, style: .default) { [weak self] _ in
-            self?.imagePicker.sourceType = type
-            self?.present(self!.imagePicker, animated: true)
+            guard let self = self else { return }
+            self.imagePicker.sourceType = type
+            DispatchQueue.main.async {
+                self.present(self.imagePicker, animated: true)
+            }
         }
+    }
+
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        picker.dismiss(animated: true)
+
+        guard let image = info[.originalImage] as? UIImage else { return }
+
+        currentImage = image
+        imagePreview.image = image
+        navigationItem.rightBarButtonItem?.isEnabled = true
+        processImage(image)
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+    }
+
+    private func updateOverlayFrame(for image: UIImage) {
+        let imageSize = image.size
+        let imageViewSize = imagePreview.bounds.size
+        let rect = AVMakeRect(aspectRatio: imageSize, insideRect: CGRect(origin: .zero, size: imageViewSize))
+        overlayView.frame = rect
     }
 
     private func handleTextRecognition(request: VNRequest?, error: Error?) {
@@ -171,6 +188,26 @@ class ImageUploadController: UIViewController,
         }
 
         let mrzLines = MRZProcessor.detectMRZLines(from: recognizedWords)
+        if let mrzLines = MRZProcessor.detectAndPrintMRZ(from: recognizedWords),
+           MRZProcessor.isLikelyMRZBlock(mrzLines) {
+            
+            detectedDocumentType = "Passport (MRZ)"
+            let lineTexts = mrzLines.map { $0.text }
+            
+            if let parsed = PassportMRZParser.parse(lines: lineTexts) {
+                let keyValuePairs = [
+                    RecognizedKeyValue(key: "SURNAME", keyTextObservation: nil, value: parsed.surname, valueTextObservation: nil),
+                    // ... other fields ...
+                ]
+                
+                DispatchQueue.main.async {
+                    self.documentTypeLabel.text = "Detected: Passport"
+                    self.recognizedKeyValuePairs = keyValuePairs
+                }
+            }
+        }
+
+
         let useMRZ = MRZProcessor.isLikelyMRZBlock(mrzLines)
 
         var keyValuePairs: [RecognizedKeyValue] = []
@@ -207,22 +244,21 @@ class ImageUploadController: UIViewController,
 
     private func processImage(_ image: UIImage) {
         guard let cgImage = image.cgImage else { return }
-        let rectangleRequest = VNDetectRectanglesRequest { [weak self] request, error in
+        let rectangleRequest = VNDetectRectanglesRequest { [weak self] request, _ in
             guard let self = self else { return }
             if let rectObservation = request.results?.first as? VNRectangleObservation {
-                print("Detected document rectangle")
                 DispatchQueue.main.async {
                     self.overlayView.drawBoundingBox(for: rectObservation.boundingBox, color: .green, lineWidth: 2.0)
                 }
                 self.runOCR(on: cgImage, regionOfInterest: rectObservation.boundingBox)
             } else {
-                print("No document detected — falling back to full image OCR")
                 self.runOCR(on: cgImage, regionOfInterest: nil)
             }
         }
         rectangleRequest.minimumConfidence = 0.8
         rectangleRequest.minimumAspectRatio = 0.5
         rectangleRequest.maximumAspectRatio = 1.0
+
         let handler = VNImageRequestHandler(cgImage: cgImage, orientation: .right, options: [:])
         DispatchQueue.global(qos: .userInitiated).async {
             try? handler.perform([rectangleRequest])
@@ -236,11 +272,9 @@ class ImageUploadController: UIViewController,
             try? handler.perform([self.detectTextRequest])
         }
     }
-}
 
-// MARK: - UITableViewDataSource
+    // MARK: - TableView
 
-extension ImageUploadController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return recognizedKeyValuePairs.count
     }
@@ -249,9 +283,9 @@ extension ImageUploadController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: KeyValueTableViewCell.identifier, for: indexPath) as? KeyValueTableViewCell else {
             return UITableViewCell()
         }
+
         let pair = recognizedKeyValuePairs[indexPath.row]
-        cell.configure(key: pair.key, value: pair.value ?? "—")
+        cell.configure(key: pair.key, value: pair.value ?? "")
         return cell
     }
 }
-
