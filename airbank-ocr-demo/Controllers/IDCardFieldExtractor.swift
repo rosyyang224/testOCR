@@ -48,8 +48,10 @@ struct IDCardFieldExtractor {
             }
 
             let filteredCandidates = candidates.filter { candidate in
-                let isToRight = candidate.box.minX > keyBox.midX - 0.01
-                let isBelow = candidate.box.midY < keyBox.midY - 0.01
+                let dx = candidate.box.midX - keyBox.midX
+                let dy = keyBox.midY - candidate.box.midY
+                let isToRight = dx > 0 && abs(dy) < 0.05
+                let isBelow = dy > 0 && abs(dx) < 0.2  
                 return isToRight || isBelow
             }
 
@@ -69,6 +71,7 @@ struct IDCardFieldExtractor {
 
         return results
     }
+
 
     private static func isValidMatch(for key: String, value: String) -> Bool {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
