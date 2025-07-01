@@ -8,9 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		A377714C2E12B137005E6BC5 /* StringMetric in Frameworks */ = {isa = PBXBuildFile; productRef = A377714B2E12B137005E6BC5 /* StringMetric */; };
-		A37771962E13D818005E6BC5 /* WindowSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771952E13D818005E6BC5 /* WindowSceneCoordinator.swift */; };
-		A37771AE2E13DADF005E6BC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771AD2E13DADF005E6BC5 /* AppDelegate.swift */; };
-		A37771D82E13F044005E6BC5 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771D72E13F044005E6BC5 /* AppTheme.swift */; };
+		A3F35F1F2E145AB6007BE738 /* RecognizedKeyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F0D2E145AB6007BE738 /* RecognizedKeyValue.swift */; };
+		A3F35F212E145AB6007BE738 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F1A2E145AB6007BE738 /* AppTheme.swift */; };
+		A3F35F222E145AB6007BE738 /* DocumentResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F052E145AB6007BE738 /* DocumentResultViewController.swift */; };
+		A3F35F232E145AB6007BE738 /* WindowSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F1B2E145AB6007BE738 /* WindowSceneCoordinator.swift */; };
+		A3F35F242E145AB6007BE738 /* ResultCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F132E145AB6007BE738 /* ResultCardView.swift */; };
+		A3F35F262E145AB6007BE738 /* TextOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F152E145AB6007BE738 /* TextOverlayView.swift */; };
+		A3F35F272E145AB6007BE738 /* ScanAgainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F142E145AB6007BE738 /* ScanAgainButton.swift */; };
+		A3F35F282E145AB6007BE738 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F062E145AB6007BE738 /* HomeViewController.swift */; };
+		A3F35F292E145AB6007BE738 /* HomeMainCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F102E145AB6007BE738 /* HomeMainCardView.swift */; };
+		A3F35F2A2E145AB6007BE738 /* HomeQuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F112E145AB6007BE738 /* HomeQuickActionsView.swift */; };
+		A3F35F2B2E145AB6007BE738 /* KeyValueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F122E145AB6007BE738 /* KeyValueTableViewCell.swift */; };
+		A3F35F2D2E145AB6007BE738 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F192E145AB6007BE738 /* AppDelegate.swift */; };
+		A3F35F2E2E145AB6007BE738 /* HomeHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F0F2E145AB6007BE738 /* HomeHeaderView.swift */; };
 		DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */; };
 		DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -27,9 +37,19 @@
 
 /* Begin PBXFileReference section */
 		A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "airbank-ocr-demoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A37771952E13D818005E6BC5 /* WindowSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneCoordinator.swift; sourceTree = "<group>"; };
-		A37771AD2E13DADF005E6BC5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A37771D72E13F044005E6BC5 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		A3F35F052E145AB6007BE738 /* DocumentResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentResultViewController.swift; sourceTree = "<group>"; };
+		A3F35F062E145AB6007BE738 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
+		A3F35F0D2E145AB6007BE738 /* RecognizedKeyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecognizedKeyValue.swift; sourceTree = "<group>"; };
+		A3F35F0F2E145AB6007BE738 /* HomeHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeHeaderView.swift; sourceTree = "<group>"; };
+		A3F35F102E145AB6007BE738 /* HomeMainCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMainCardView.swift; sourceTree = "<group>"; };
+		A3F35F112E145AB6007BE738 /* HomeQuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeQuickActionsView.swift; sourceTree = "<group>"; };
+		A3F35F122E145AB6007BE738 /* KeyValueTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueTableViewCell.swift; sourceTree = "<group>"; };
+		A3F35F132E145AB6007BE738 /* ResultCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultCardView.swift; sourceTree = "<group>"; };
+		A3F35F142E145AB6007BE738 /* ScanAgainButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanAgainButton.swift; sourceTree = "<group>"; };
+		A3F35F152E145AB6007BE738 /* TextOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayView.swift; sourceTree = "<group>"; };
+		A3F35F192E145AB6007BE738 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A3F35F1A2E145AB6007BE738 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		A3F35F1B2E145AB6007BE738 /* WindowSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneCoordinator.swift; sourceTree = "<group>"; };
 		DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "airbank-ocr-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DFAD6E902382AABE00FE14F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -37,9 +57,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A37771622E13D07F005E6BC5 /* Models */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Models; sourceTree = "<group>"; };
-		A37771692E13D0F4005E6BC5 /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
-		A377716A2E13D0FC005E6BC5 /* Controllers */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Controllers; sourceTree = "<group>"; };
+		A3F35F312E145B2F007BE738 /* Processing */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Processing; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +79,65 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A3F35F0C2E145AB6007BE738 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				A3F35F052E145AB6007BE738 /* DocumentResultViewController.swift */,
+				A3F35F062E145AB6007BE738 /* HomeViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		A3F35F0E2E145AB6007BE738 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A3F35F0D2E145AB6007BE738 /* RecognizedKeyValue.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A3F35F162E145AB6007BE738 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A3F35F0F2E145AB6007BE738 /* HomeHeaderView.swift */,
+				A3F35F102E145AB6007BE738 /* HomeMainCardView.swift */,
+				A3F35F112E145AB6007BE738 /* HomeQuickActionsView.swift */,
+				A3F35F122E145AB6007BE738 /* KeyValueTableViewCell.swift */,
+				A3F35F132E145AB6007BE738 /* ResultCardView.swift */,
+				A3F35F142E145AB6007BE738 /* ScanAgainButton.swift */,
+				A3F35F152E145AB6007BE738 /* TextOverlayView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A3F35F172E145AB6007BE738 /* OCR */ = {
+			isa = PBXGroup;
+			children = (
+				A3F35F312E145B2F007BE738 /* Processing */,
+				A3F35F0C2E145AB6007BE738 /* Controllers */,
+				A3F35F0E2E145AB6007BE738 /* Models */,
+				A3F35F162E145AB6007BE738 /* Views */,
+			);
+			path = OCR;
+			sourceTree = "<group>";
+		};
+		A3F35F182E145AB6007BE738 /* PDFSummary */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = PDFSummary;
+			sourceTree = "<group>";
+		};
+		A3F35F1C2E145AB6007BE738 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A3F35F192E145AB6007BE738 /* AppDelegate.swift */,
+				A3F35F1A2E145AB6007BE738 /* AppTheme.swift */,
+				A3F35F1B2E145AB6007BE738 /* WindowSceneCoordinator.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		DFAD6E782382AABB00FE14F7 = {
 			isa = PBXGroup;
 			children = (
@@ -81,15 +158,12 @@
 		DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */ = {
 			isa = PBXGroup;
 			children = (
-				A37771D72E13F044005E6BC5 /* AppTheme.swift */,
-				A37771AD2E13DADF005E6BC5 /* AppDelegate.swift */,
-				A37771952E13D818005E6BC5 /* WindowSceneCoordinator.swift */,
-				A377716A2E13D0FC005E6BC5 /* Controllers */,
-				A37771692E13D0F4005E6BC5 /* Views */,
-				A37771622E13D07F005E6BC5 /* Models */,
 				DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */,
 				DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */,
 				DFAD6E922382AABE00FE14F7 /* Info.plist */,
+				A3F35F172E145AB6007BE738 /* OCR */,
+				A3F35F182E145AB6007BE738 /* PDFSummary */,
+				A3F35F1C2E145AB6007BE738 /* Shared */,
 			);
 			path = "airbank-ocr-demo";
 			sourceTree = "<group>";
@@ -130,9 +204,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A37771622E13D07F005E6BC5 /* Models */,
-				A37771692E13D0F4005E6BC5 /* Views */,
-				A377716A2E13D0FC005E6BC5 /* Controllers */,
+				A3F35F312E145B2F007BE738 /* Processing */,
 			);
 			name = "airbank-ocr-demo";
 			productName = "airbank-ocr-demo";
@@ -211,9 +283,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A37771AE2E13DADF005E6BC5 /* AppDelegate.swift in Sources */,
-				A37771D82E13F044005E6BC5 /* AppTheme.swift in Sources */,
-				A37771962E13D818005E6BC5 /* WindowSceneCoordinator.swift in Sources */,
+				A3F35F1F2E145AB6007BE738 /* RecognizedKeyValue.swift in Sources */,
+				A3F35F212E145AB6007BE738 /* AppTheme.swift in Sources */,
+				A3F35F222E145AB6007BE738 /* DocumentResultViewController.swift in Sources */,
+				A3F35F232E145AB6007BE738 /* WindowSceneCoordinator.swift in Sources */,
+				A3F35F242E145AB6007BE738 /* ResultCardView.swift in Sources */,
+				A3F35F262E145AB6007BE738 /* TextOverlayView.swift in Sources */,
+				A3F35F272E145AB6007BE738 /* ScanAgainButton.swift in Sources */,
+				A3F35F282E145AB6007BE738 /* HomeViewController.swift in Sources */,
+				A3F35F292E145AB6007BE738 /* HomeMainCardView.swift in Sources */,
+				A3F35F2A2E145AB6007BE738 /* HomeQuickActionsView.swift in Sources */,
+				A3F35F2B2E145AB6007BE738 /* KeyValueTableViewCell.swift in Sources */,
+				A3F35F2D2E145AB6007BE738 /* AppDelegate.swift in Sources */,
+				A3F35F2E2E145AB6007BE738 /* HomeHeaderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
