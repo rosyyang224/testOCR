@@ -54,6 +54,9 @@ final class ResultCardView: UIView {
         
         documentTypeLabel.setContentCompressionResistancePriority(.required, for: .vertical)
         documentTypeLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        
+        documentTypeLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        documentTypeLabel.setContentHuggingPriority(.defaultHigh, for: .vertical)
 
         let stack = UIStackView(arrangedSubviews: [documentTypeLabel, imagePreview, tableView])
         stack.axis = .vertical
@@ -76,7 +79,13 @@ final class ResultCardView: UIView {
         ])
         
         tableHeightConstraint = tableView.heightAnchor.constraint(equalToConstant: 0)
+        tableHeightConstraint.priority = .defaultHigh
         tableHeightConstraint.isActive = true
+
+        let maxTableHeightConstraint = tableView.heightAnchor.constraint(lessThanOrEqualTo: self.heightAnchor, multiplier: 0.5)
+        maxTableHeightConstraint.priority = .required
+        maxTableHeightConstraint.isActive = true
+
 
     }
 }
