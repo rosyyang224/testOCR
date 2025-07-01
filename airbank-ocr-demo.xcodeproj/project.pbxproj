@@ -10,6 +10,7 @@
 		A377714C2E12B137005E6BC5 /* StringMetric in Frameworks */ = {isa = PBXBuildFile; productRef = A377714B2E12B137005E6BC5 /* StringMetric */; };
 		A37771962E13D818005E6BC5 /* WindowSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771952E13D818005E6BC5 /* WindowSceneCoordinator.swift */; };
 		A37771AE2E13DADF005E6BC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771AD2E13DADF005E6BC5 /* AppDelegate.swift */; };
+		A37771D82E13F044005E6BC5 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A37771D72E13F044005E6BC5 /* AppTheme.swift */; };
 		DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */; };
 		DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -28,6 +29,7 @@
 		A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "airbank-ocr-demoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A37771952E13D818005E6BC5 /* WindowSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneCoordinator.swift; sourceTree = "<group>"; };
 		A37771AD2E13DADF005E6BC5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A37771D72E13F044005E6BC5 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "airbank-ocr-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DFAD6E902382AABE00FE14F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -79,6 +81,7 @@
 		DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */ = {
 			isa = PBXGroup;
 			children = (
+				A37771D72E13F044005E6BC5 /* AppTheme.swift */,
 				A37771AD2E13DADF005E6BC5 /* AppDelegate.swift */,
 				A37771952E13D818005E6BC5 /* WindowSceneCoordinator.swift */,
 				A377716A2E13D0FC005E6BC5 /* Controllers */,
@@ -209,6 +212,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A37771AE2E13DADF005E6BC5 /* AppDelegate.swift in Sources */,
+				A37771D82E13F044005E6BC5 /* AppTheme.swift in Sources */,
 				A37771962E13D818005E6BC5 /* WindowSceneCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
