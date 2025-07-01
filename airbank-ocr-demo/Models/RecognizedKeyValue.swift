@@ -72,4 +72,12 @@ struct RecognizedKeyValue {
     var documentElement: DocumentElement? {
         DocumentElement(rawValue: key)
     }
+    
+    init(key: String, value: String?, keyTextObservation: VNRecognizedTextObservation? = nil, valueTextObservation: VNRecognizedTextObservation? = nil) {
+        self.key = key
+        self.value = value
+        self.keyTextObservation = keyTextObservation
+        self.valueTextObservation = valueTextObservation
+    }
+
 }

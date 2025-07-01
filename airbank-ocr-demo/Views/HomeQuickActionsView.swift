@@ -26,7 +26,7 @@ final class HomeQuickActionsView: UIStackView {
     }
 
     private func setupButtons() {
-        historyButton.setTitle("📋 Recent Scans", for: .normal)
+        historyButton.setTitle("Recent Scans", for: .normal)
         AppTheme.styleSecondaryButton(historyButton)
         addArrangedSubview(historyButton)
     }

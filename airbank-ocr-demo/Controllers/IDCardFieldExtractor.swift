@@ -60,8 +60,8 @@ struct IDCardFieldExtractor {
             if let match = bestMatch, isValidMatch(for: matchedElement.rawValue, value: match.text) {
                 results.append(RecognizedKeyValue(
                     key: matchedElement.rawValue,
-                    keyTextObservation: keyObs,
                     value: match.text,
+                    keyTextObservation: keyObs,
                     valueTextObservation: match.observation
                 ))
             }
