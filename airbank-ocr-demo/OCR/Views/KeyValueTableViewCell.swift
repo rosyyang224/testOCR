@@ -6,7 +6,6 @@
 //  Copyright © 2025 Marek Přidal. All rights reserved.
 //
 
-
 import UIKit
 
 class KeyValueTableViewCell: UITableViewCell {

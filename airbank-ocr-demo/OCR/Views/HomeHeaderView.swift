@@ -6,8 +6,6 @@
 //  Copyright © 2025 Marek Přidal. All rights reserved.
 //
 
-
-// HomeHeaderView.swift
 import UIKit
 
 final class HomeHeaderView: UIView {
