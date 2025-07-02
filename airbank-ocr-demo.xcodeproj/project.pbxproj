@@ -21,6 +21,14 @@
 		A3F35F2B2E145AB6007BE738 /* KeyValueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F122E145AB6007BE738 /* KeyValueTableViewCell.swift */; };
 		A3F35F2D2E145AB6007BE738 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F192E145AB6007BE738 /* AppDelegate.swift */; };
 		A3F35F2E2E145AB6007BE738 /* HomeHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F0F2E145AB6007BE738 /* HomeHeaderView.swift */; };
+		A3F35F3F2E151E9F007BE738 /* PageClassifierApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F3E2E151E9F007BE738 /* PageClassifierApp.swift */; };
+		A3F35F412E15201C007BE738 /* ClassifierHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F402E15201C007BE738 /* ClassifierHomeView.swift */; };
+		A3F35F432E152028007BE738 /* PageClassifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F422E152028007BE738 /* PageClassifierView.swift */; };
+		A3F35F452E152038007BE738 /* OCRProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F442E152038007BE738 /* OCRProcessor.swift */; };
+		A3F35F472E152046007BE738 /* PageClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F462E152046007BE738 /* PageClassifier.swift */; };
+		A3F35F492E152053007BE738 /* DocumentPickerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F482E152053007BE738 /* DocumentPickerDelegate.swift */; };
+		A3F35F4B2E1522AA007BE738 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F4A2E1522AA007BE738 /* App.swift */; };
+		A3F35F4D2E1522B1007BE738 /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F4C2E1522B1007BE738 /* MainHomeView.swift */; };
 		DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */; };
 		DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -50,6 +58,14 @@
 		A3F35F192E145AB6007BE738 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A3F35F1A2E145AB6007BE738 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		A3F35F1B2E145AB6007BE738 /* WindowSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneCoordinator.swift; sourceTree = "<group>"; };
+		A3F35F3E2E151E9F007BE738 /* PageClassifierApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageClassifierApp.swift; sourceTree = "<group>"; };
+		A3F35F402E15201C007BE738 /* ClassifierHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClassifierHomeView.swift; sourceTree = "<group>"; };
+		A3F35F422E152028007BE738 /* PageClassifierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageClassifierView.swift; sourceTree = "<group>"; };
+		A3F35F442E152038007BE738 /* OCRProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OCRProcessor.swift; sourceTree = "<group>"; };
+		A3F35F462E152046007BE738 /* PageClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageClassifier.swift; sourceTree = "<group>"; };
+		A3F35F482E152053007BE738 /* DocumentPickerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPickerDelegate.swift; sourceTree = "<group>"; };
+		A3F35F4A2E1522AA007BE738 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		A3F35F4C2E1522B1007BE738 /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "airbank-ocr-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DFAD6E902382AABE00FE14F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -124,6 +140,12 @@
 		A3F35F182E145AB6007BE738 /* PDFSummary */ = {
 			isa = PBXGroup;
 			children = (
+				A3F35F482E152053007BE738 /* DocumentPickerDelegate.swift */,
+				A3F35F462E152046007BE738 /* PageClassifier.swift */,
+				A3F35F442E152038007BE738 /* OCRProcessor.swift */,
+				A3F35F422E152028007BE738 /* PageClassifierView.swift */,
+				A3F35F402E15201C007BE738 /* ClassifierHomeView.swift */,
+				A3F35F3E2E151E9F007BE738 /* PageClassifierApp.swift */,
 			);
 			path = PDFSummary;
 			sourceTree = "<group>";
@@ -132,7 +154,6 @@
 			isa = PBXGroup;
 			children = (
 				A3F35F192E145AB6007BE738 /* AppDelegate.swift */,
-				A3F35F1A2E145AB6007BE738 /* AppTheme.swift */,
 				A3F35F1B2E145AB6007BE738 /* WindowSceneCoordinator.swift */,
 			);
 			path = Shared;
@@ -158,6 +179,9 @@
 		DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */ = {
 			isa = PBXGroup;
 			children = (
+				A3F35F4C2E1522B1007BE738 /* MainHomeView.swift */,
+				A3F35F1A2E145AB6007BE738 /* AppTheme.swift */,
+				A3F35F4A2E1522AA007BE738 /* App.swift */,
 				DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */,
 				DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */,
 				DFAD6E922382AABE00FE14F7 /* Info.plist */,
@@ -283,19 +307,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A3F35F3F2E151E9F007BE738 /* PageClassifierApp.swift in Sources */,
+				A3F35F472E152046007BE738 /* PageClassifier.swift in Sources */,
+				A3F35F412E15201C007BE738 /* ClassifierHomeView.swift in Sources */,
 				A3F35F1F2E145AB6007BE738 /* RecognizedKeyValue.swift in Sources */,
 				A3F35F212E145AB6007BE738 /* AppTheme.swift in Sources */,
+				A3F35F4D2E1522B1007BE738 /* MainHomeView.swift in Sources */,
+				A3F35F452E152038007BE738 /* OCRProcessor.swift in Sources */,
 				A3F35F222E145AB6007BE738 /* DocumentResultViewController.swift in Sources */,
 				A3F35F232E145AB6007BE738 /* WindowSceneCoordinator.swift in Sources */,
+				A3F35F4B2E1522AA007BE738 /* App.swift in Sources */,
 				A3F35F242E145AB6007BE738 /* ResultCardView.swift in Sources */,
 				A3F35F262E145AB6007BE738 /* TextOverlayView.swift in Sources */,
 				A3F35F272E145AB6007BE738 /* ScanAgainButton.swift in Sources */,
 				A3F35F282E145AB6007BE738 /* HomeViewController.swift in Sources */,
 				A3F35F292E145AB6007BE738 /* HomeMainCardView.swift in Sources */,
+				A3F35F432E152028007BE738 /* PageClassifierView.swift in Sources */,
 				A3F35F2A2E145AB6007BE738 /* HomeQuickActionsView.swift in Sources */,
 				A3F35F2B2E145AB6007BE738 /* KeyValueTableViewCell.swift in Sources */,
 				A3F35F2D2E145AB6007BE738 /* AppDelegate.swift in Sources */,
 				A3F35F2E2E145AB6007BE738 /* HomeHeaderView.swift in Sources */,
+				A3F35F492E152053007BE738 /* DocumentPickerDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -494,6 +526,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
 				INFOPLIST_FILE = "airbank-ocr-demo/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -513,6 +546,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
 				INFOPLIST_FILE = "airbank-ocr-demo/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

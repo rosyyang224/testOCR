@@ -6,8 +6,8 @@
 //  Copyright © 2025 Marek Přidal. All rights reserved.
 //
 
-
 import UIKit
+import SwiftUI
 
 class WindowSceneCoordinator: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -21,15 +21,11 @@ class WindowSceneCoordinator: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
 
         window = UIWindow(windowScene: windowScene)
-        let rootVC = HomeViewController()
-        let navController = UINavigationController(rootViewController: rootVC)
-        navController.tabBarItem = UITabBarItem(title: "Upload", image: UIImage(systemName: "photo"), selectedImage: UIImage(systemName: "photo.fill"))
 
-        let tabController = UITabBarController()
-        tabController.viewControllers = [navController]
+        // Swap from HomeViewController to SwiftUI root
+        let rootVC = UIHostingController(rootView: MainHomeView())
 
-        window?.rootViewController = tabController
+        window?.rootViewController = rootVC
         window?.makeKeyAndVisible()
     }
-
 }
