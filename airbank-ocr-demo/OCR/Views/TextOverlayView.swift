@@ -13,7 +13,6 @@ import Vision
 final class TextOverlayView: UIView {
     private var layers = [CAShapeLayer]()
 
-    /// Draws bounding box for a recognized text observation
     func drawBoundingBox(for observation: VNRecognizedTextObservation) {
         let imageRect = bounds
         let rect = CGRect(
@@ -41,7 +40,6 @@ final class TextOverlayView: UIView {
         }
     }
 
-    /// Draws a bounding box from a normalized CGRect (e.g., from a rectangle detector)
     func drawBoundingBox(for normalizedRect: CGRect, color: UIColor = .green, lineWidth: CGFloat = 2.0) {
         let rect = CGRect(
             x: normalizedRect.origin.x * bounds.width,

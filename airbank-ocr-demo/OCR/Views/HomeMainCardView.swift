@@ -6,14 +6,6 @@
 //  Copyright © 2025 Marek Přidal. All rights reserved.
 //
 
-
-//
-//  HomeMainCardView.swift
-//  airbank-ocr-demo
-//
-//  Created by Rosemary Yang on 7/1/25.
-//
-
 import UIKit
 
 final class HomeMainCardView: UIView {
