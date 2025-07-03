@@ -1,6 +1,36 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+private struct SummaryCard: View {
+    let title: String
+    let content: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                    .imageScale(.large)
+
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(color)
+            }
+
+            Text(content)
+                .font(.body)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.leading)
+        }
+        .padding()
+        .background(Color(.systemBackground).opacity(0.95))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+    }
+}
+
 struct PDFSummarizerView: View {
     @State private var summary: StructuredSummary?
     @State private var isProcessing = false
@@ -18,7 +48,7 @@ struct PDFSummarizerView: View {
                         .font(.largeTitle)
                         .fontWeight(.bold)
 
-                    Text("Powered by Apple Vision + Foundation Models")
+                    Text("Requires iOS 18/macOS 15+ for table recognition")
                         .font(.caption)
                         .foregroundColor(.secondary)
 
@@ -165,6 +195,14 @@ struct PDFSummarizerView: View {
         }
 
         do {
+            guard #available(iOS 18.0, macOS 15.0, *) else {
+                await MainActor.run {
+                    errorMessage = "Table recognition requires iOS 18 or macOS 15."
+                    isProcessing = false
+                }
+                return
+            }
+
             await updateProgress(0.2, "Extracting document structure with Vision...")
             let sections = await DocumentProcessor.extractStructuredContent(from: url)
 
