@@ -13,7 +13,7 @@ struct MainHomeView: View {
                 }
 
             // Prong 2: PDF Page Classifier (PDFSummary)
-            PageClassifierView()
+            PageSummaryView()
                 .tabItem {
                     Label("Classifier", systemImage: "doc.text.magnifyingglass")
                 }
