@@ -1,4 +1,9 @@
-// PDFSelector.swift
+//
+//  PDFSelector.swift
+//  airbank-ocr-demo
+//
+//  Created by Rosemary Yang on 7/3/25.
+//
 import Foundation
 import SwiftUI
 import UniformTypeIdentifiers

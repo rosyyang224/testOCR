@@ -1,27 +1,23 @@
 //
-//  MainHomeView.swift
+//  PDFSummaryHomeView.swift
 //  airbank-ocr-demo
 //
 //  Created by Rosemary Yang on 7/2/25.
-//  Copyright © 2025 Marek Přidal. All rights reserved.
 //
 
-
-// MainHomeView.swift
 import SwiftUI
 
-struct MainHomeView: View {
+struct PDFSummaryHomeView: View {
     var body: some View {
         NavigationView {
             List {
-                NavigationLink("📄 Classify Pages", destination: PageClassifierView())
-                NavigationLink("🧠 Summarize Sections", destination: SectionSummarizerView())
+                NavigationLink("Summarize PDF", destination: PDFSummarizerView())
             }
-            .navigationTitle("Report Toolkit")
+            .navigationTitle("PDF Toolkit")
         }
     }
 }
 
 #Preview {
-    MainHomeView()
+    PDFSummaryHomeView()
 }

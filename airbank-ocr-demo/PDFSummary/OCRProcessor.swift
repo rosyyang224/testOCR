@@ -30,4 +30,22 @@ enum OCRProcessor {
             return []
         }
     }
+    
+    static func extractRawObservations(from image: UIImage) async -> [VNRecognizedTextObservation] {
+        guard let cgImage = image.cgImage else { return [] }
+
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        request.usesLanguageCorrection = false
+
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        do {
+            try handler.perform([request])
+            return request.results as? [VNRecognizedTextObservation] ?? []
+        } catch {
+            return []
+        }
+    }
+
+    
 }

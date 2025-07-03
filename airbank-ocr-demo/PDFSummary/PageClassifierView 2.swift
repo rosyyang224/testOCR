@@ -1,3 +1,12 @@
+//
+//  PageClassifierView 2.swift
+//  airbank-ocr-demo
+//
+//  Created by Rosemary Yang on 7/2/25.
+//  Copyright © 2025 Marek Přidal. All rights reserved.
+//
+
+
 // PageClassifierView.swift
 import SwiftUI
 import PDFKit
