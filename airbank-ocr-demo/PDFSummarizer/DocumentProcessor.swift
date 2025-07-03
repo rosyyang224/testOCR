@@ -1,9 +1,11 @@
-// DocumentProcessor.swift (Generalized Text + Table JSON Extraction)
-// Uses WWDC25 VisionKit for new table parsing capabilities
+//
+//  DocumentProcessor.swift
+//  Generalized Text + Table JSON Extraction (iOS 18 / macOS 15+)
+//
 
 import UIKit
-import VisionKit
 import Vision
+import VisionKit
 
 struct DocumentSection {
     let type: SectionType
@@ -31,6 +33,7 @@ struct DocumentSection {
 }
 
 enum DocumentProcessor {
+    @MainActor
     static func extractStructuredContent(from url: URL) async -> [DocumentSection] {
         guard let document = CGPDFDocument(url as CFURL) else {
             print("Failed to create PDF document from URL: \(url)")
@@ -48,6 +51,7 @@ enum DocumentProcessor {
                 ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
                 ctx.cgContext.drawPDFPage(page)
             }
+
             let sections = await extractTextAndTables(from: image, pageNumber: pageIndex)
             allSections.append(contentsOf: sections)
         }
@@ -57,6 +61,7 @@ enum DocumentProcessor {
 
     private static func extractTextAndTables(from image: UIImage, pageNumber: Int) async -> [DocumentSection] {
         guard let cgImage = image.cgImage else { return [] }
+
         var results: [DocumentSection] = []
 
         await withTaskGroup(of: [DocumentSection].self) { group in
@@ -67,8 +72,8 @@ enum DocumentProcessor {
                 await extractTablesWithJSON(from: cgImage, pageNumber: pageNumber)
             }
 
-            for await section in group {
-                results.append(contentsOf: section)
+            for await sectionList in group {
+                results.append(contentsOf: sectionList)
             }
         }
 
@@ -113,55 +118,52 @@ enum DocumentProcessor {
         }
     }
 
+    @available(iOS 18.0, macOS 15.0, *)
     private static func extractTablesWithJSON(from cgImage: CGImage, pageNumber: Int) async -> [DocumentSection] {
-        let tableDetection = VNDetectDocumentTablesRequest()
+        let request = RecognizeDocumentsRequest()
         let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
 
         do {
-            try handler.perform([tableDetection])
-            let tables = tableDetection.results ?? []
+            try handler.perform([request])
+            guard let observations = request.results as? [DocumentObservation] else { return [] }
 
             var sections: [DocumentSection] = []
-            for table in tables {
-                let tableReadRequest = VNReadDocumentTableRequest(table: table)
-                try handler.perform([tableReadRequest])
 
-                guard let tableResult = tableReadRequest.results?.first else { continue }
-                let jsonRows: [[String: String]] = convertToJSON(tableResult)
-                let rawText = jsonRows.map { $0.values.joined(separator: " | ") }.joined(separator: "\n")
+            for document in observations {
+                for table in document.tables {
+                    let headers = table.rows.first?.map { $0.content.text.transcript } ?? []
+                    let dataRows = table.rows.dropFirst()
 
-                sections.append(DocumentSection(
-                    type: .detectedTable,
-                    content: rawText,
-                    pageNumber: pageNumber,
-                    boundingBox: table.boundingBox,
-                    confidence: table.confidence,
-                    metadata: nil,
-                    tableJSON: jsonRows
-                ))
+                    let tableJSON: [[String: String]] = dataRows.map { row in
+                        var dict: [String: String] = [:]
+                        for (i, cell) in row.enumerated() {
+                            let key = headers[safe: i] ?? "Column \(i + 1)"
+                            dict[key] = cell.content.text.transcript
+                        }
+                        return dict
+                    }
+
+                    let rawText = tableJSON
+                        .map { $0.values.joined(separator: " | ") }
+                        .joined(separator: "\n")
+
+                    sections.append(DocumentSection(
+                        type: .detectedTable,
+                        content: rawText,
+                        pageNumber: pageNumber,
+                        boundingBox: table.boundingRegion.boundingBox,
+                        confidence: 1.0,
+                        metadata: nil,
+                        tableJSON: tableJSON
+                    ))
+                }
             }
 
             return sections
         } catch {
-            print("Table detection or parsing failed: \(error.localizedDescription)")
+            print("Table detection failed: \(error.localizedDescription)")
             return []
         }
-    }
-
-    private static func convertToJSON(_ table: VNDocumentTable) -> [[String: String]] {
-        guard !table.rows.isEmpty else { return [] }
-        let headers = table.rows.first?.cells.map { $0.text ?? "" } ?? []
-        var jsonRows: [[String: String]] = []
-
-        for row in table.rows.dropFirst() {
-            var dict: [String: String] = [:]
-            for (i, cell) in row.cells.enumerated() {
-                let key = headers[safe: i] ?? "Column \(i+1)"
-                dict[key] = cell.text ?? ""
-            }
-            jsonRows.append(dict)
-        }
-        return jsonRows
     }
 
     private static func classify(text: String) -> DocumentSection.SectionType {
@@ -170,7 +172,7 @@ enum DocumentProcessor {
             return .headerInfo
         } else if lowered.contains("disclaimer") || lowered.contains("confidential") {
             return .footerDisclaimer
-        } else if text.contains("\u2022") || text.contains("-") || text.contains("•") {
+        } else if text.contains("\u{2022}") || text.contains("-") || text.contains("•") {
             return .list
         } else {
             return .paragraph
@@ -178,7 +180,7 @@ enum DocumentProcessor {
     }
 }
 
-// Safe index for array
+// MARK: - Safe Array Access
 fileprivate extension Array {
     subscript(safe index: Int) -> Element? {
         return indices.contains(index) ? self[index] : nil
