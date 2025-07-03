@@ -1,6 +1,5 @@
 //
 //  DocumentProcessor.swift
-//  Generalized Text + Table JSON Extraction (iOS 18 / macOS 15+)
 //
 
 import UIKit
@@ -53,49 +52,82 @@ enum DocumentProcessor {
                 ctx.cgContext.drawPDFPage(page)
             }
 
-            let sections = await extractPageContent(from: image, pageNumber: pageIndex)
-            allSections.append(contentsOf: sections)
+            let pageSections = await extractTextAndTables(from: image, pageNumber: pageIndex)
+            allSections.append(contentsOf: pageSections)
         }
 
         return allSections
     }
 
-    @MainActor
-    private static func extractPageContent(from image: UIImage, pageNumber: Int) async -> [DocumentSection] {
-        guard let imageData = image.pngData() else { return [] }
-
+    private static func extractTextAndTables(from image: UIImage, pageNumber: Int) async -> [DocumentSection] {
         var results: [DocumentSection] = []
+
+        await withTaskGroup(of: [DocumentSection].self) { group in
+            if let cgImage = image.cgImage {
+                group.addTask {
+                    await extractTextBlocks(from: cgImage, pageNumber: pageNumber)
+                }
+                group.addTask {
+                    await extractTables(from: image.pngData(), pageNumber: pageNumber)
+                }
+            }
+
+            for await sectionList in group {
+                results.append(contentsOf: sectionList)
+            }
+        }
+
+        return results
+    }
+
+    private static func extractTextBlocks(from cgImage: CGImage, pageNumber: Int) async -> [DocumentSection] {
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        request.automaticallyDetectsLanguage = true
+        request.usesLanguageCorrection = true
+
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        do {
+            try handler.perform([request])
+            let observations = request.results as? [VNRecognizedTextObservation] ?? []
+
+            return observations.compactMap { observation in
+                guard let topCandidate = observation.topCandidates(1).first else { return nil }
+                let text = topCandidate.string.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !text.isEmpty else { return nil }
+
+                let meta = DocumentSection.SectionMetadata(
+                    containsNumbers: text.rangeOfCharacter(from: .decimalDigits) != nil,
+                    hasPercentages: text.contains("%"),
+                    hasCurrency: ["$", "€", "£", "¥", "USD", "EUR", "HKD"].contains { text.contains($0) }
+                )
+
+                return DocumentSection(
+                    type: classify(text: text),
+                    content: text,
+                    pageNumber: pageNumber,
+                    boundingBox: observation.boundingBox,
+                    confidence: topCandidate.confidence,
+                    metadata: meta,
+                    tableJSON: nil
+                )
+            }
+        } catch {
+            print("Text recognition failed: \(error.localizedDescription)")
+            return []
+        }
+    }
+
+    private static func extractTables(from imageData: Data?, pageNumber: Int) async -> [DocumentSection] {
+        guard let imageData else { return [] }
 
         do {
             let request = RecognizeDocumentsRequest()
             let observations = try await request.perform(on: imageData)
-
             guard let document = observations.first?.document else { return [] }
 
-            // TEXT BLOCKS
-            for textBlock in document.textBlocks {
-                let rawText = textBlock.text.transcript.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !rawText.isEmpty else { continue }
+            var sections: [DocumentSection] = []
 
-                let metadata = DocumentSection.SectionMetadata(
-                    containsNumbers: rawText.rangeOfCharacter(from: .decimalDigits) != nil,
-                    hasPercentages: rawText.contains("%"),
-                    hasCurrency: ["$", "€", "£", "¥", "USD", "EUR", "HKD"].contains { rawText.contains($0) }
-                )
-
-                let section = DocumentSection(
-                    type: classify(text: rawText),
-                    content: rawText,
-                    pageNumber: pageNumber,
-                    boundingBox: textBlock.boundingRegion.boundingBox,
-                    confidence: 1.0,
-                    metadata: metadata,
-                    tableJSON: nil
-                )
-                results.append(section)
-            }
-
-            // TABLES
             for table in document.tables {
                 let headers = table.rows.first?.map { $0.content.text.transcript } ?? []
                 let dataRows = table.rows.dropFirst()
@@ -111,7 +143,7 @@ enum DocumentProcessor {
 
                 let rawContent = tableJSON.map { $0.values.joined(separator: " | ") }.joined(separator: "\n")
 
-                let section = DocumentSection(
+                sections.append(DocumentSection(
                     type: .contactTable,
                     content: rawContent,
                     pageNumber: pageNumber,
@@ -119,15 +151,14 @@ enum DocumentProcessor {
                     confidence: 1.0,
                     metadata: nil,
                     tableJSON: tableJSON
-                )
-                results.append(section)
+                ))
             }
 
+            return sections
         } catch {
-            print("❌ Vision request failed: \(error)")
+            print("Table extraction failed: \(error)")
+            return []
         }
-
-        return results
     }
 
     private static func classify(text: String) -> DocumentSection.SectionType {
@@ -137,7 +168,7 @@ enum DocumentProcessor {
             return .header
         } else if lowered.contains("disclaimer") || lowered.contains("confidential") {
             return .footer
-        } else if text.contains("\u{2022}") || text.contains("- ") || text.contains("•") {
+        } else if text.contains("•") || text.contains("- ") || text.contains("\u{2022}") {
             return .list
         } else {
             return .paragraph
@@ -149,13 +180,5 @@ enum DocumentProcessor {
 fileprivate extension Array {
     subscript(safe index: Int) -> Element? {
         indices.contains(index) ? self[index] : nil
-    }
-}
-
-// MARK: - Coordinate Helpers
-fileprivate extension CGRect {
-    /// Converts Vision normalized coordinates to UIKit flipped coordinate space.
-    func verticallyFlipped() -> CGRect {
-        return CGRect(x: origin.x, y: 1.0 - origin.y - height, width: width, height: height)
     }
 }
