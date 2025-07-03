@@ -31,32 +31,72 @@ struct DocumentSection {
     }
 }
 
+struct PageVisualOverlay {
+    let image: UIImage
+    let textBoxes: [VNRecognizedTextObservation]
+    let tableBoxes: [CGRect]
+}
+
 enum DocumentProcessor {
     @MainActor
-    static func extractStructuredContent(from url: URL) async -> [DocumentSection] {
-        guard let document = CGPDFDocument(url as CFURL) else {
-            print("Failed to create PDF document from URL: \(url)")
-            return []
-        }
-
-        let pageCount = document.numberOfPages
-        var allSections: [DocumentSection] = []
-
-        for pageIndex in 1...pageCount {
-            guard let page = document.page(at: pageIndex) else { continue }
-            let pageRect = page.getBoxRect(.mediaBox)
-
-            let image = UIGraphicsImageRenderer(size: pageRect.size).image { ctx in
-                ctx.cgContext.translateBy(x: 0, y: pageRect.size.height)
-                ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
-                ctx.cgContext.drawPDFPage(page)
+    static func extractStructuredContent(from url: URL) async -> ([DocumentSection], [PageVisualOverlay]) {
+            guard let document = CGPDFDocument(url as CFURL) else {
+                print("Failed to create PDF document from URL: \(url)")
+                return ([], [])
             }
 
-            let pageSections = await extractTextAndTables(from: image, pageNumber: pageIndex)
-            allSections.append(contentsOf: pageSections)
+            let pageCount = document.numberOfPages
+            var allSections: [DocumentSection] = []
+            var allVisuals: [PageVisualOverlay] = []
+
+            for pageIndex in 1...pageCount {
+                guard let page = document.page(at: pageIndex) else { continue }
+                let pageRect = page.getBoxRect(.mediaBox)
+
+                let image = UIGraphicsImageRenderer(size: pageRect.size).image { ctx in
+                    ctx.cgContext.translateBy(x: 0, y: pageRect.size.height)
+                    ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
+                    ctx.cgContext.drawPDFPage(page)
+                }
+
+                let cgImage = image.cgImage
+                let imageData = image.pngData()
+
+                var textBoxes: [VNRecognizedTextObservation] = []
+                var tableBoxes: [CGRect] = []
+
+                await withTaskGroup(of: [DocumentSection].self) { group in
+                    if let cgImage {
+                        group.addTask {
+                            let sections = await extractTextBlocks(from: cgImage, pageNumber: pageIndex)
+                            textBoxes = sections.compactMap {
+                                guard let box = $0.boundingBox else { return nil }
+                                return VNRecognizedTextObservation(boundingBox: box)
+                            }
+                            return sections
+                        }
+                    }
+
+                    if let imageData {
+                        group.addTask {
+                            let tableSections = await extractTables(from: imageData, pageNumber: pageIndex)
+                            tableBoxes = tableSections.compactMap { $0.boundingBox }
+                            return tableSections
+                        }
+                    }
+
+                    for await sectionList in group {
+                        allSections.append(contentsOf: sectionList)
+                    }
+                }
+
+                let overlay = PageVisualOverlay(image: image, textBoxes: textBoxes, tableBoxes: tableBoxes)
+                allVisuals.append(overlay)
+            }
+
+            return (allSections, allVisuals)
         }
 
-        return allSections
     }
 
     private static func extractTextAndTables(from image: UIImage, pageNumber: Int) async -> [DocumentSection] {
