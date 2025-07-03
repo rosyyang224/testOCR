@@ -1,15 +1,8 @@
-//
-//  PDFSummarizerView.swift
-//  airbank-ocr-demo
-//
-//  Created by Rosemary Yang on 7/3/25.
-//  Copyright © 2025 Marek Přidal. All rights reserved.
-//
 import SwiftUI
 import UniformTypeIdentifiers
 
 struct PDFSummarizerView: View {
-    @State private var documentAnalysis: DocumentAnalysis?
+    @State private var summary: StructuredSummary?
     @State private var isProcessing = false
     @State private var showingDocumentPicker = false
     @State private var errorMessage: String?
@@ -19,16 +12,16 @@ struct PDFSummarizerView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // Header Section
+                // Header
                 VStack(spacing: 12) {
                     Text("AI Document Analyzer")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                    
+
                     Text("Powered by Apple Vision + Foundation Models")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    
+
                     Button(action: {
                         showingDocumentPicker = true
                     }) {
@@ -45,17 +38,15 @@ struct PDFSummarizerView: View {
                     .disabled(isProcessing)
                 }
                 .padding()
-                
-                // Processing Section
+
+                // Progress section
                 if isProcessing {
                     VStack(spacing: 12) {
-                        ProgressView(value: processingProgress, total: 1.0)
+                        ProgressView(value: processingProgress)
                             .progressViewStyle(LinearProgressViewStyle())
-                        
                         Text(currentStep)
                             .font(.caption)
                             .foregroundColor(.secondary)
-                        
                         HStack {
                             ProgressView()
                                 .scaleEffect(0.8)
@@ -67,8 +58,8 @@ struct PDFSummarizerView: View {
                     .background(Color.blue.opacity(0.1))
                     .cornerRadius(12)
                 }
-                
-                // Error Section
+
+                // Error message
                 if let error = errorMessage {
                     HStack {
                         Image(systemName: "exclamationmark.triangle.fill")
@@ -80,56 +71,47 @@ struct PDFSummarizerView: View {
                     .background(Color.orange.opacity(0.1))
                     .cornerRadius(8)
                 }
-                
-                // Results Section
-                if let analysis = documentAnalysis {
+
+                // Results
+                if let summary = summary {
                     VStack(spacing: 16) {
-                        // Document Overview Card
-                        DocumentOverviewCard(analysis: analysis)
-                        
-                        // Executive Summary Card
                         SummaryCard(
                             title: "Executive Summary",
-                            content: analysis.structuredSummary.executiveSummary,
+                            content: summary.executiveSummary,
                             icon: "doc.text.fill",
                             color: .blue
                         )
-                        
-                        // Detailed Analysis Sections
-                        if !analysis.structuredSummary.tableSummary.isEmpty &&
-                           !analysis.structuredSummary.tableSummary.contains("No tables found") {
+
+                        if !summary.tableSummary.isEmpty && !summary.tableSummary.contains("No tables found") {
                             SummaryCard(
                                 title: "Tables & Data Analysis",
-                                content: analysis.structuredSummary.tableSummary,
+                                content: summary.tableSummary,
                                 icon: "tablecells.fill",
                                 color: .green
                             )
                         }
-                        
-                        if !analysis.structuredSummary.textSummary.isEmpty &&
-                           !analysis.structuredSummary.textSummary.contains("No text content found") {
+
+                        if !summary.textSummary.isEmpty && !summary.textSummary.contains("No text content found") {
                             SummaryCard(
                                 title: "Content Summary",
-                                content: analysis.structuredSummary.textSummary,
+                                content: summary.textSummary,
                                 icon: "text.alignleft",
                                 color: .purple
                             )
                         }
-                        
-                        if !analysis.structuredSummary.listSummary.isEmpty &&
-                           !analysis.structuredSummary.listSummary.contains("No lists found") {
+
+                        if !summary.listSummary.isEmpty && !summary.listSummary.contains("No lists found") {
                             SummaryCard(
                                 title: "Key Points & Lists",
-                                content: analysis.structuredSummary.listSummary,
+                                content: summary.listSummary,
                                 icon: "list.bullet",
                                 color: .orange
                             )
                         }
-                        
-                        // Document Structure
+
                         SummaryCard(
                             title: "Document Structure",
-                            content: analysis.structuredSummary.documentStructure,
+                            content: summary.documentStructure,
                             icon: "doc.richtext",
                             color: .indigo
                         )
@@ -155,18 +137,16 @@ struct PDFSummarizerView: View {
         do {
             let urls = try result.get()
             guard let url = urls.first else { return }
-            
+
             guard url.startAccessingSecurityScopedResource() else {
                 await MainActor.run {
                     errorMessage = "Failed to access selected file"
                 }
                 return
             }
-            
-            defer {
-                url.stopAccessingSecurityScopedResource()
-            }
-            
+
+            defer { url.stopAccessingSecurityScopedResource() }
+
             await analyzeDocument(from: url)
         } catch {
             await MainActor.run {
@@ -178,19 +158,43 @@ struct PDFSummarizerView: View {
     private func analyzeDocument(from url: URL) async {
         await MainActor.run {
             isProcessing = true
-            documentAnalysis = nil
+            summary = nil
             errorMessage = nil
             processingProgress = 0.0
             currentStep = "Initializing document processing..."
         }
 
         do {
-            // Step 1: Extract structured content using Vision
             await updateProgress(0.2, "Extracting document structure with Vision...")
             let sections = await DocumentProcessor.extractStructuredContent(from: url)
-            
+
             if sections.isEmpty {
                 await MainActor.run {
                     errorMessage = "No content could be extracted from the PDF"
                     isProcessing = false
                 }
+                return
+            }
+
+            await updateProgress(0.6, "Summarizing extracted content with Foundation Models...")
+            let result = try await FoundationSummaryClient.summarizeStructuredContent(sections)
+
+            await MainActor.run {
+                summary = result
+                isProcessing = false
+            }
+        } catch {
+            await MainActor.run {
+                errorMessage = "Analysis failed: \(error.localizedDescription)"
+                isProcessing = false
+            }
+        }
+    }
+
+    private func updateProgress(_ progress: Double, _ step: String) async {
+        await MainActor.run {
+            processingProgress = progress
+            currentStep = step
+        }
+    }
+}
