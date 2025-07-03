@@ -1,8 +1,3 @@
-//  FoundationSummaryClient.swift
-//  airbank-ocr-demo
-//
-//  Created by Rosemary Yang on 7/2/25.
-
 import Foundation
 import FoundationModels
 
@@ -11,52 +6,121 @@ enum FoundationSummaryClient {
     static func summarizeStructuredContent(_ sections: [DocumentSection]) async throws -> StructuredSummary {
         let session = try await createOptimizedSession()
 
-        // Separate content by type for better processing
-        let tables = sections.filter { $0.type == .financialTable }
-        let textBlocks = sections.filter { $0.type == .paragraph }
-        let lists = sections.filter { $0.type == .list }
-        let headers = sections.filter { $0.type == .headerInfo }
+        let textSummaries = try await summarizeTextSectionsIndividually(sections.filter { $0.type == .paragraph }, session: session)
+        let tableSummaries = try await summarizeTableSectionsIndividually(sections.filter { $0.type == .detectedTable }, session: session)
+        let listSummary = try await summarizeLists(sections.filter { $0.type == .list }, session: session)
+        let headerSummary = try await summarizeHeaders(sections.filter { $0.type == .headerInfo }, session: session)
 
-        async let tableSummary = summarizeTables(tables, session: session)
-        async let textSummary = summarizeTextBlocks(textBlocks, session: session)
-        async let listSummary = summarizeLists(lists, session: session)
-        async let headerSummary = summarizeHeaders(headers, session: session)
-
-        let results = try await (tableSummary, textSummary, listSummary, headerSummary)
+        // Merge individual results for overall summary
+        let mergedText = textSummaries.joined(separator: "\n\n")
+        let mergedTables = tableSummaries.joined(separator: "\n\n")
 
         let overallPrompt = """
         Create a comprehensive executive summary based on this structured content:
 
         DOCUMENT STRUCTURE:
-        \(results.3)
+        \(headerSummary)
 
         KEY TABLES AND DATA:
-        \(results.0)
+        \(mergedTables)
 
         MAIN CONTENT:
-        \(results.1)
+        \(mergedText)
 
         LISTS AND BULLET POINTS:
-        \(results.2)
+        \(listSummary)
 
-        Provide a 3-4 sentence executive summary that captures the main findings, key data points, and actionable insights.
+        Provide a 3–4 sentence executive summary that captures the main findings, key data points, and actionable insights.
         """
 
         let overallSummary = try await session.respond(to: overallPrompt)
 
         return StructuredSummary(
             executiveSummary: overallSummary.content,
-            tableSummary: results.0,
-            textSummary: results.1,
-            listSummary: results.2,
-            documentStructure: results.3,
+            tableSummary: mergedTables,
+            textSummary: mergedText,
+            listSummary: listSummary,
+            documentStructure: headerSummary,
             totalSections: sections.count
         )
     }
 
+    private static func summarizeTextSectionsIndividually(_ textBlocks: [DocumentSection], session: LanguageModelSession) async throws -> [String] {
+        var summaries: [String] = []
+        for section in textBlocks {
+            let prompt = """
+            Summarize the following document text in 1–2 sentences:
+
+            Page \(section.pageNumber):
+            \(section.content)
+            """
+            let result = try await session.respond(to: prompt)
+            summaries.append(result.content)
+        }
+        return summaries
+    }
+
+    private static func summarizeTableSectionsIndividually(_ tableBlocks: [DocumentSection], session: LanguageModelSession) async throws -> [String] {
+        var summaries: [String] = []
+
+        for section in tableBlocks {
+            guard let table = section.tableJSON else { continue }
+
+            let tableText = table.map { row in
+                row.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
+            }.joined(separator: "\n")
+
+            let prompt = """
+            Analyze the following table and summarize key figures, trends, or outliers in 1–2 sentences.
+
+            Page \(section.pageNumber):
+            \(tableText)
+            """
+
+            let result = try await session.respond(to: prompt)
+            summaries.append(result.content)
+        }
+
+        return summaries
+    }
+
+    private static func summarizeLists(_ lists: [DocumentSection], session: LanguageModelSession) async throws -> String {
+        guard !lists.isEmpty else { return "No lists found in document." }
+
+        let listContent = lists.map { section in
+            "Page \(section.pageNumber): \(section.content)"
+        }.joined(separator: "\n\n")
+
+        let prompt = """
+        Summarize the following list items. Highlight key actions, patterns, or categories:
+
+        \(listContent)
+        """
+
+        let result = try await session.respond(to: prompt)
+        return result.content
+    }
+
+    private static func summarizeHeaders(_ headers: [DocumentSection], session: LanguageModelSession) async throws -> String {
+        guard !headers.isEmpty else { return "Document structure not clearly defined." }
+
+        let headerContent = headers.map { section in
+            "Page \(section.pageNumber): \(section.content)"
+        }.joined(separator: "\n")
+
+        let prompt = """
+        Based on the following headers, outline the document structure and main topics:
+
+        \(headerContent)
+        """
+
+        let result = try await session.respond(to: prompt)
+        return result.content
+    }
+
     static func summarize(_ text: String) async throws -> String {
         let session = try await createOptimizedSession()
-        let prompt = "Summarize this content in 2-3 sentences, focusing on key insights and actionable information:\n\n\(text)"
+        let prompt = "Summarize this content in 2–3 sentences:\n\n\(text)"
         let result = try await session.respond(to: prompt)
         return result.content
     }
@@ -67,7 +131,7 @@ enum FoundationSummaryClient {
 
     static func summarizeFinancialSection(_ text: String) async throws -> String {
         let session = try await createOptimizedSession()
-        let prompt = "Summarize this financial section in 1-2 concise sentences:\n\n\(text)"
+        let prompt = "Summarize this financial section in 1–2 concise sentences:\n\n\(text)"
         let result = try await session.respond(to: prompt)
         return result.content
     }
@@ -84,92 +148,6 @@ enum FoundationSummaryClient {
 
         _ = try await session.respond(to: systemPrompt)
         return session
-    }
-
-    private static func summarizeTables(_ tables: [DocumentSection], session: LanguageModelSession) async throws -> String {
-        guard !tables.isEmpty else { return "No tables found in document." }
-
-        let tableContent = tables.enumerated().map { index, section in
-            "Page \(section.pageNumber) - \(section.content)"
-        }.joined(separator: "\n\n")
-
-        let prompt = """
-        Analyze these tables and provide a summary focusing on:
-        - Key numerical data and trends
-        - Important comparisons or changes
-        - Notable patterns or outliers
-
-        Tables:
-        \(tableContent)
-        """
-
-        let result = try await session.respond(to: prompt)
-        return result.content
-    }
-
-    private static func summarizeTextBlocks(_ textBlocks: [DocumentSection], session: LanguageModelSession) async throws -> String {
-        guard !textBlocks.isEmpty else { return "No text content found in document." }
-
-        let groupedText = Dictionary(grouping: textBlocks) { $0.pageNumber }
-        let combinedText = groupedText.sorted { $0.key < $1.key }.map { page, sections in
-            let pageContent = sections.map { $0.content }.joined(separator: "\n\n")
-            return "Page \(page):\n\(pageContent)"
-        }.joined(separator: "\n\n---\n\n")
-
-        let prompt = """
-        Summarize the main content of this document, focusing on:
-        - Primary objectives and conclusions
-        - Key findings and recommendations
-        - Important context and background
-
-        Content:
-        \(combinedText)
-        """
-
-        let result = try await session.respond(to: prompt)
-        return result.content
-    }
-
-    private static func summarizeLists(_ lists: [DocumentSection], session: LanguageModelSession) async throws -> String {
-        guard !lists.isEmpty else { return "No lists found in document." }
-
-        let listContent = lists.enumerated().map { index, section in
-            "Page \(section.pageNumber) - \(section.content)"
-        }.joined(separator: "\n\n")
-
-        let prompt = """
-        Summarize these lists and bullet points, highlighting:
-        - Key action items or recommendations
-        - Important categories or groupings
-        - Priority items or critical points
-
-        Lists:
-        \(listContent)
-        """
-
-        let result = try await session.respond(to: prompt)
-        return result.content
-    }
-
-    private static func summarizeHeaders(_ headers: [DocumentSection], session: LanguageModelSession) async throws -> String {
-        guard !headers.isEmpty else { return "Document structure not clearly defined." }
-
-        let headerContent = headers.map { section in
-            "Page \(section.pageNumber): \(section.content)"
-        }.joined(separator: "\n")
-
-        let prompt = """
-        Based on these document headers and structure, describe:
-        - Document organization and main sections
-        - Flow of information and logical structure
-        - Key topics covered
-
-        Headers:
-        \(headerContent)
-        """
-
-        let result = try await session.respond(to: prompt)
-        return result.content
     }
 }
 
