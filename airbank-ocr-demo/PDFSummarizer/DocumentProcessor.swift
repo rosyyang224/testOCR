@@ -35,7 +35,7 @@ enum DocumentProcessor {
     @MainActor
     static func extractStructuredContent(from url: URL) async -> [DocumentSection] {
         guard let document = CGPDFDocument(url as CFURL) else {
-            print("❌ Failed to create PDF document from URL: \(url)")
+            print("Failed to create PDF document from URL: \(url)")
             return []
         }
 

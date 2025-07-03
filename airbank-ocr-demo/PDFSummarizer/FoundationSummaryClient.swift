@@ -2,21 +2,21 @@ import Foundation
 import FoundationModels
 
 enum FoundationSummaryClient {
-
+    
     static func summarizeStructuredContent(_ sections: [DocumentSection]) async throws -> StructuredSummary {
         let session = try await createOptimizedSession()
 
         let textSummaries = try await summarizeTextSectionsIndividually(sections.filter { $0.type == .paragraph }, session: session)
-        let tableSummaries = try await summarizeTableSectionsIndividually(sections.filter { $0.type == .detectedTable }, session: session)
+        let tableSummaries = try await summarizeTableSectionsIndividually(sections.filter { $0.type == .contactTable }, session: session)
         let listSummary = try await summarizeLists(sections.filter { $0.type == .list }, session: session)
-        let headerSummary = try await summarizeHeaders(sections.filter { $0.type == .headerInfo }, session: session)
+        let headerSummary = try await summarizeHeaders(sections.filter { $0.type == .header }, session: session)
 
-        // Merge individual results for overall summary
+        // Merge text and table summaries
         let mergedText = textSummaries.joined(separator: "\n\n")
         let mergedTables = tableSummaries.joined(separator: "\n\n")
 
         let overallPrompt = """
-        Create a comprehensive executive summary based on this structured content:
+        You are reviewing a financial or business document.
 
         DOCUMENT STRUCTURE:
         \(headerSummary)
@@ -30,7 +30,7 @@ enum FoundationSummaryClient {
         LISTS AND BULLET POINTS:
         \(listSummary)
 
-        Provide a 3–4 sentence executive summary that captures the main findings, key data points, and actionable insights.
+        Provide a 3–4 sentence executive summary highlighting the key figures, business insights, and decisions.
         """
 
         let overallSummary = try await session.respond(to: overallPrompt)
@@ -71,7 +71,7 @@ enum FoundationSummaryClient {
             }.joined(separator: "\n")
 
             let prompt = """
-            Analyze the following table and summarize key figures, trends, or outliers in 1–2 sentences.
+            Analyze the following table and summarize key data points, trends, or outliers in 1–2 sentences.
 
             Page \(section.pageNumber):
             \(tableText)
@@ -92,7 +92,7 @@ enum FoundationSummaryClient {
         }.joined(separator: "\n\n")
 
         let prompt = """
-        Summarize the following list items. Highlight key actions, patterns, or categories:
+        Summarize the following list items. Highlight categories, action items, and patterns:
 
         \(listContent)
         """
@@ -109,7 +109,7 @@ enum FoundationSummaryClient {
         }.joined(separator: "\n")
 
         let prompt = """
-        Based on the following headers, outline the document structure and main topics:
+        Based on the following headers, infer the document structure and key sections:
 
         \(headerContent)
         """
@@ -140,10 +140,9 @@ enum FoundationSummaryClient {
         let session = LanguageModelSession()
 
         let systemPrompt = """
-        You are an expert business analyst specializing in document summarization. 
-        Focus on extracting key insights, quantitative data, trends, and actionable recommendations.
-        When summarizing tables, highlight important numbers, comparisons, and patterns.
-        Keep summaries concise but comprehensive, suitable for executive review.
+        You are an expert document summarizer. Your task is to analyze structured content from scanned financial or business documents.
+        For tables, highlight important metrics and trends. For text, extract the most important insights.
+        Be concise and clear, writing for a business audience.
         """
 
         _ = try await session.respond(to: systemPrompt)
