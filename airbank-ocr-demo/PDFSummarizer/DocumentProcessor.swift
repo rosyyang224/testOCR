@@ -18,10 +18,10 @@ struct DocumentSection {
 
     enum SectionType {
         case paragraph
-        case headerInfo
-        case footerDisclaimer
+        case contactTable
+        case header
+        case footer
         case list
-        case detectedTable
         case unknown
     }
 
@@ -36,7 +36,7 @@ enum DocumentProcessor {
     @MainActor
     static func extractStructuredContent(from url: URL) async -> [DocumentSection] {
         guard let document = CGPDFDocument(url as CFURL) else {
-            print("Failed to create PDF document from URL: \(url)")
+            print("❌ Failed to create PDF document from URL: \(url)")
             return []
         }
 
@@ -46,133 +46,98 @@ enum DocumentProcessor {
         for pageIndex in 1...pageCount {
             guard let page = document.page(at: pageIndex) else { continue }
             let pageRect = page.getBoxRect(.mediaBox)
+
             let image = UIGraphicsImageRenderer(size: pageRect.size).image { ctx in
                 ctx.cgContext.translateBy(x: 0, y: pageRect.size.height)
                 ctx.cgContext.scaleBy(x: 1.0, y: -1.0)
                 ctx.cgContext.drawPDFPage(page)
             }
 
-            let sections = await extractTextAndTables(from: image, pageNumber: pageIndex)
+            let sections = await extractPageContent(from: image, pageNumber: pageIndex)
             allSections.append(contentsOf: sections)
         }
 
         return allSections
     }
 
-    private static func extractTextAndTables(from image: UIImage, pageNumber: Int) async -> [DocumentSection] {
-        guard let cgImage = image.cgImage else { return [] }
+    @MainActor
+    private static func extractPageContent(from image: UIImage, pageNumber: Int) async -> [DocumentSection] {
+        guard let imageData = image.pngData() else { return [] }
 
         var results: [DocumentSection] = []
 
-        await withTaskGroup(of: [DocumentSection].self) { group in
-            group.addTask {
-                await extractTextBlocks(from: cgImage, pageNumber: pageNumber)
-            }
-            group.addTask {
-                await extractTablesWithJSON(from: cgImage, pageNumber: pageNumber)
+        do {
+            let request = RecognizeDocumentsRequest()
+            let observations = try await request.perform(on: imageData)
+
+            guard let document = observations.first?.document else { return [] }
+
+            // TEXT BLOCKS
+            for textBlock in document.textBlocks {
+                let rawText = textBlock.text.transcript.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !rawText.isEmpty else { continue }
+
+                let metadata = DocumentSection.SectionMetadata(
+                    containsNumbers: rawText.rangeOfCharacter(from: .decimalDigits) != nil,
+                    hasPercentages: rawText.contains("%"),
+                    hasCurrency: ["$", "€", "£", "¥", "USD", "EUR", "HKD"].contains { rawText.contains($0) }
+                )
+
+                let section = DocumentSection(
+                    type: classify(text: rawText),
+                    content: rawText,
+                    pageNumber: pageNumber,
+                    boundingBox: textBlock.boundingRegion.boundingBox,
+                    confidence: 1.0,
+                    metadata: metadata,
+                    tableJSON: nil
+                )
+                results.append(section)
             }
 
-            for await sectionList in group {
-                results.append(contentsOf: sectionList)
+            // TABLES
+            for table in document.tables {
+                let headers = table.rows.first?.map { $0.content.text.transcript } ?? []
+                let dataRows = table.rows.dropFirst()
+
+                let tableJSON: [[String: String]] = dataRows.map { row in
+                    var dict: [String: String] = [:]
+                    for (i, cell) in row.enumerated() {
+                        let key = headers[safe: i] ?? "Column \(i + 1)"
+                        dict[key] = cell.content.text.transcript
+                    }
+                    return dict
+                }
+
+                let rawContent = tableJSON.map { $0.values.joined(separator: " | ") }.joined(separator: "\n")
+
+                let section = DocumentSection(
+                    type: .contactTable,
+                    content: rawContent,
+                    pageNumber: pageNumber,
+                    boundingBox: table.boundingRegion.boundingBox,
+                    confidence: 1.0,
+                    metadata: nil,
+                    tableJSON: tableJSON
+                )
+                results.append(section)
             }
+
+        } catch {
+            print("❌ Vision request failed: \(error)")
         }
 
         return results
     }
 
-    private static func extractTextBlocks(from cgImage: CGImage, pageNumber: Int) async -> [DocumentSection] {
-        let request = VNRecognizeTextRequest()
-        request.recognitionLevel = .accurate
-        request.usesLanguageCorrection = true
-        request.automaticallyDetectsLanguage = true
-
-        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-        do {
-            try handler.perform([request])
-            let observations = request.results as? [VNRecognizedTextObservation] ?? []
-
-            return observations.compactMap { observation in
-                guard let topCandidate = observation.topCandidates(1).first else { return nil }
-                let text = topCandidate.string.trimmingCharacters(in: .whitespacesAndNewlines)
-                guard !text.isEmpty else { return nil }
-
-                let meta = DocumentSection.SectionMetadata(
-                    containsNumbers: text.rangeOfCharacter(from: .decimalDigits) != nil,
-                    hasPercentages: text.contains("%"),
-                    hasCurrency: ["$", "€", "£", "¥", "USD", "EUR", "HKD"].contains { text.contains($0) }
-                )
-
-                return DocumentSection(
-                    type: classify(text: text),
-                    content: text,
-                    pageNumber: pageNumber,
-                    boundingBox: observation.boundingBox,
-                    confidence: topCandidate.confidence,
-                    metadata: meta,
-                    tableJSON: nil
-                )
-            }
-        } catch {
-            print("Text recognition failed: \(error.localizedDescription)")
-            return []
-        }
-    }
-
-    @available(iOS 18.0, macOS 15.0, *)
-    private static func extractTablesWithJSON(from cgImage: CGImage, pageNumber: Int) async -> [DocumentSection] {
-        let request = RecognizeDocumentsRequest()
-        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-
-        do {
-            try handler.perform([request])
-            guard let observations = request.results as? [DocumentObservation] else { return [] }
-
-            var sections: [DocumentSection] = []
-
-            for document in observations {
-                for table in document.tables {
-                    let headers = table.rows.first?.map { $0.content.text.transcript } ?? []
-                    let dataRows = table.rows.dropFirst()
-
-                    let tableJSON: [[String: String]] = dataRows.map { row in
-                        var dict: [String: String] = [:]
-                        for (i, cell) in row.enumerated() {
-                            let key = headers[safe: i] ?? "Column \(i + 1)"
-                            dict[key] = cell.content.text.transcript
-                        }
-                        return dict
-                    }
-
-                    let rawText = tableJSON
-                        .map { $0.values.joined(separator: " | ") }
-                        .joined(separator: "\n")
-
-                    sections.append(DocumentSection(
-                        type: .detectedTable,
-                        content: rawText,
-                        pageNumber: pageNumber,
-                        boundingBox: table.boundingRegion.boundingBox,
-                        confidence: 1.0,
-                        metadata: nil,
-                        tableJSON: tableJSON
-                    ))
-                }
-            }
-
-            return sections
-        } catch {
-            print("Table detection failed: \(error.localizedDescription)")
-            return []
-        }
-    }
-
     private static func classify(text: String) -> DocumentSection.SectionType {
         let lowered = text.lowercased()
-        if lowered.count < 50 && (lowered.contains("summary") || lowered.contains("report")) {
-            return .headerInfo
+
+        if lowered.contains("summary") || lowered.contains("report") {
+            return .header
         } else if lowered.contains("disclaimer") || lowered.contains("confidential") {
-            return .footerDisclaimer
-        } else if text.contains("\u{2022}") || text.contains("-") || text.contains("•") {
+            return .footer
+        } else if text.contains("\u{2022}") || text.contains("- ") || text.contains("•") {
             return .list
         } else {
             return .paragraph
@@ -183,6 +148,14 @@ enum DocumentProcessor {
 // MARK: - Safe Array Access
 fileprivate extension Array {
     subscript(safe index: Int) -> Element? {
-        return indices.contains(index) ? self[index] : nil
+        indices.contains(index) ? self[index] : nil
+    }
+}
+
+// MARK: - Coordinate Helpers
+fileprivate extension CGRect {
+    /// Converts Vision normalized coordinates to UIKit flipped coordinate space.
+    func verticallyFlipped() -> CGRect {
+        return CGRect(x: origin.x, y: 1.0 - origin.y - height, width: width, height: height)
     }
 }
