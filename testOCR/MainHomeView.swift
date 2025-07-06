@@ -4,7 +4,7 @@ struct MainHomeView: View {
     var body: some View {
         TabView {
             // Prong 1: OCR Scan Tool
-            HomeOCRView()
+            HomeScreenView()
                 .tabItem {
                     Label("OCR", systemImage: "viewfinder")
                 }
@@ -21,21 +21,6 @@ struct MainHomeView: View {
                     Label("Query", systemImage: "questionmark.circle")
                 }
         }
-    }
-}
-
-struct HomeOCRView: View {
-    var body: some View {
-        ScrollView {
-            HomeMainCardView {
-                // Add action here if needed
-                print("Scan tapped")
-            }
-        }
-        .navigationTitle("Scan Passport")
-        #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
     }
 }
 

@@ -1,12 +1,3 @@
-//
-//  TextOverlayBox.swift
-//  airbank-ocr-demo
-//
-//  Created by Rosemary Yang on 7/3/25.
-//  Copyright © 2025 Marek Přidal. All rights reserved.
-//
-
-
 import SwiftUI
 import Vision
 
@@ -16,12 +7,23 @@ struct TextOverlayBox: View {
     var body: some View {
         GeometryReader { geometry in
             ForEach(observations.indices, id: \.self) { index in
-                let rect = convert(observations[index].boundingBox, in: geometry.size)
+                let obs = observations[index]
+                let rect = convert(obs.boundingBox, in: geometry.size)
+                let text = obs.topCandidates(1).first?.string ?? ""
 
-                RoundedRectangle(cornerRadius: 4)
-                    .stroke(Color.yellow, lineWidth: 2)
-                    .frame(width: rect.width, height: rect.height)
-                    .position(x: rect.midX, y: rect.midY)
+                ZStack(alignment: .topLeading) {
+                    RoundedRectangle(cornerRadius: 6)
+                        .stroke(Color.yellow.opacity(0.8), lineWidth: 2)
+                        .background(Color.clear)
+                        .frame(width: rect.width, height: rect.height)
+                        .position(x: rect.midX, y: rect.midY)
+
+                    Text(text)
+                        .font(.system(size: 6))
+                        .foregroundColor(.red)
+                        .position(x: rect.minX + 4, y: rect.minY + 6) // Adjust padding if needed
+                        .frame(maxWidth: rect.width - 4, alignment: .leading)
+                }
             }
         }
     }

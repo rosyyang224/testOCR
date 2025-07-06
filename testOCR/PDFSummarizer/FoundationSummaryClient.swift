@@ -146,15 +146,22 @@ enum FoundationSummaryClient {
     }
 
     private static func createOptimizedSession() async throws -> LanguageModelSession {
-        let session = LanguageModelSession()
-
-        let systemPrompt = """
-        You are an expert document summarizer. Your task is to analyze structured content from scanned financial or business documents.
-        For tables, highlight important metrics and trends. For text, extract the most important insights.
-        Be concise and clear, writing for a business audience.
-        """
-
-        _ = try await session.respond(to: systemPrompt)
+//        let session = LanguageModelSession()
+//
+//        let systemPrompt = """
+//        You are an expert document summarizer. Your task is to analyze structured content from scanned financial or business documents.
+//        For tables, highlight important metrics and trends. For text, extract the most important insights.
+//        Be concise and clear, writing for a business audience.
+//        """
+//
+//        _ = try await session.respond(to: systemPrompt)
+        let session = try await LanguageModelSession(
+            instructions: Instructions {
+                """
+                You are an expert document summarizer. Your task is to analyze structured content...
+                """
+            }
+        )
         return session
     }
     
