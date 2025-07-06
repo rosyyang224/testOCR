@@ -3,142 +3,93 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 74;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A377714C2E12B137005E6BC5 /* StringMetric in Frameworks */ = {isa = PBXBuildFile; productRef = A377714B2E12B137005E6BC5 /* StringMetric */; };
-		A3F35F1F2E145AB6007BE738 /* RecognizedKeyValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F0D2E145AB6007BE738 /* RecognizedKeyValue.swift */; };
-		A3F35F212E145AB6007BE738 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F1A2E145AB6007BE738 /* AppTheme.swift */; };
-		A3F35F222E145AB6007BE738 /* DocumentResultViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F052E145AB6007BE738 /* DocumentResultViewController.swift */; };
-		A3F35F232E145AB6007BE738 /* WindowSceneCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F1B2E145AB6007BE738 /* WindowSceneCoordinator.swift */; };
-		A3F35F242E145AB6007BE738 /* ResultCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F132E145AB6007BE738 /* ResultCardView.swift */; };
-		A3F35F262E145AB6007BE738 /* TextOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F152E145AB6007BE738 /* TextOverlayView.swift */; };
-		A3F35F272E145AB6007BE738 /* ScanAgainButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F142E145AB6007BE738 /* ScanAgainButton.swift */; };
-		A3F35F282E145AB6007BE738 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F062E145AB6007BE738 /* HomeViewController.swift */; };
-		A3F35F292E145AB6007BE738 /* HomeMainCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F102E145AB6007BE738 /* HomeMainCardView.swift */; };
-		A3F35F2A2E145AB6007BE738 /* HomeQuickActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F112E145AB6007BE738 /* HomeQuickActionsView.swift */; };
-		A3F35F2B2E145AB6007BE738 /* KeyValueTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F122E145AB6007BE738 /* KeyValueTableViewCell.swift */; };
-		A3F35F2D2E145AB6007BE738 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F192E145AB6007BE738 /* AppDelegate.swift */; };
-		A3F35F2E2E145AB6007BE738 /* HomeHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F0F2E145AB6007BE738 /* HomeHeaderView.swift */; };
-		A3F35F4B2E1522AA007BE738 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F4A2E1522AA007BE738 /* App.swift */; };
-		A3F35F4D2E1522B1007BE738 /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F35F4C2E1522B1007BE738 /* MainHomeView.swift */; };
-		DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */; };
-		DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */; };
+		A311AB932E168BF900C8B181 /* StringMetric in Frameworks */ = {isa = PBXBuildFile; productRef = A311AB922E168BF900C8B181 /* StringMetric */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A37771552E12C179005E6BC5 /* PBXContainerItemProxy */ = {
+		A311AB272E16883F00C8B181 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DFAD6E792382AABB00FE14F7 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = DFAD6E802382AABB00FE14F7;
-			remoteInfo = "airbank-ocr-demo";
+			remoteGlobalIDString = A311AB192E16883E00C8B181;
+			remoteInfo = "testOCR-both";
+		};
+		A311AB312E16883F00C8B181 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DFAD6E792382AABB00FE14F7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A311AB192E16883E00C8B181;
+			remoteInfo = "testOCR-both";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "airbank-ocr-demoUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A3F35F052E145AB6007BE738 /* DocumentResultViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentResultViewController.swift; sourceTree = "<group>"; };
-		A3F35F062E145AB6007BE738 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
-		A3F35F0D2E145AB6007BE738 /* RecognizedKeyValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecognizedKeyValue.swift; sourceTree = "<group>"; };
-		A3F35F0F2E145AB6007BE738 /* HomeHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeHeaderView.swift; sourceTree = "<group>"; };
-		A3F35F102E145AB6007BE738 /* HomeMainCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMainCardView.swift; sourceTree = "<group>"; };
-		A3F35F112E145AB6007BE738 /* HomeQuickActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeQuickActionsView.swift; sourceTree = "<group>"; };
-		A3F35F122E145AB6007BE738 /* KeyValueTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyValueTableViewCell.swift; sourceTree = "<group>"; };
-		A3F35F132E145AB6007BE738 /* ResultCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultCardView.swift; sourceTree = "<group>"; };
-		A3F35F142E145AB6007BE738 /* ScanAgainButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanAgainButton.swift; sourceTree = "<group>"; };
-		A3F35F152E145AB6007BE738 /* TextOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextOverlayView.swift; sourceTree = "<group>"; };
-		A3F35F192E145AB6007BE738 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		A3F35F1A2E145AB6007BE738 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
-		A3F35F1B2E145AB6007BE738 /* WindowSceneCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WindowSceneCoordinator.swift; sourceTree = "<group>"; };
-		A3F35F4A2E1522AA007BE738 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
-		A3F35F4C2E1522B1007BE738 /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
-		DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "airbank-ocr-demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		DFAD6E902382AABE00FE14F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		DFAD6E922382AABE00FE14F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A311AB1A2E16883E00C8B181 /* testOCR-both.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "testOCR-both.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A311AB262E16883F00C8B181 /* testOCR-bothTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "testOCR-bothTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A311AB302E16883F00C8B181 /* testOCR-bothUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "testOCR-bothUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A311AB722E1688A600C8B181 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				/Localized/LaunchScreen.storyboard,
+				Info.plist,
+			);
+			target = A311AB192E16883E00C8B181 /* testOCR-both */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A3F35F312E145B2F007BE738 /* Processing */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Processing; sourceTree = "<group>"; };
-		A3F35F572E153B3B007BE738 /* PDFSummarizer */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PDFSummarizer; sourceTree = "<group>"; };
+		A311AB1B2E16883E00C8B181 /* testOCR */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (A311AB722E1688A600C8B181 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = testOCR; sourceTree = "<group>"; };
+		A311AB292E16883F00C8B181 /* testOCR-bothTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "testOCR-bothTests"; sourceTree = "<group>"; };
+		A311AB332E16883F00C8B181 /* testOCR-bothUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "testOCR-bothUITests"; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		A377714E2E12C179005E6BC5 /* Frameworks */ = {
+		A311AB172E16883E00C8B181 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A311AB932E168BF900C8B181 /* StringMetric in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A311AB232E16883F00C8B181 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DFAD6E7E2382AABB00FE14F7 /* Frameworks */ = {
+		A311AB2D2E16883F00C8B181 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A377714C2E12B137005E6BC5 /* StringMetric in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A3F35F0C2E145AB6007BE738 /* Controllers */ = {
+		A311AB8E2E168B9F00C8B181 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				A3F35F052E145AB6007BE738 /* DocumentResultViewController.swift */,
-				A3F35F062E145AB6007BE738 /* HomeViewController.swift */,
 			);
-			path = Controllers;
-			sourceTree = "<group>";
-		};
-		A3F35F0E2E145AB6007BE738 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				A3F35F0D2E145AB6007BE738 /* RecognizedKeyValue.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		A3F35F162E145AB6007BE738 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				A3F35F0F2E145AB6007BE738 /* HomeHeaderView.swift */,
-				A3F35F102E145AB6007BE738 /* HomeMainCardView.swift */,
-				A3F35F112E145AB6007BE738 /* HomeQuickActionsView.swift */,
-				A3F35F122E145AB6007BE738 /* KeyValueTableViewCell.swift */,
-				A3F35F132E145AB6007BE738 /* ResultCardView.swift */,
-				A3F35F142E145AB6007BE738 /* ScanAgainButton.swift */,
-				A3F35F152E145AB6007BE738 /* TextOverlayView.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
-		A3F35F172E145AB6007BE738 /* OCR */ = {
-			isa = PBXGroup;
-			children = (
-				A3F35F312E145B2F007BE738 /* Processing */,
-				A3F35F0C2E145AB6007BE738 /* Controllers */,
-				A3F35F0E2E145AB6007BE738 /* Models */,
-				A3F35F162E145AB6007BE738 /* Views */,
-			);
-			path = OCR;
-			sourceTree = "<group>";
-		};
-		A3F35F1C2E145AB6007BE738 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				A3F35F192E145AB6007BE738 /* AppDelegate.swift */,
-				A3F35F1B2E145AB6007BE738 /* WindowSceneCoordinator.swift */,
-			);
-			path = Shared;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		DFAD6E782382AABB00FE14F7 = {
 			isa = PBXGroup;
 			children = (
-				DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */,
+				A311AB1B2E16883E00C8B181 /* testOCR */,
+				A311AB292E16883F00C8B181 /* testOCR-bothTests */,
+				A311AB332E16883F00C8B181 /* testOCR-bothUITests */,
+				A311AB8E2E168B9F00C8B181 /* Frameworks */,
 				DFAD6E822382AABB00FE14F7 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -146,71 +97,84 @@
 		DFAD6E822382AABB00FE14F7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */,
-				A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */,
+				A311AB1A2E16883E00C8B181 /* testOCR-both.app */,
+				A311AB262E16883F00C8B181 /* testOCR-bothTests.xctest */,
+				A311AB302E16883F00C8B181 /* testOCR-bothUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		DFAD6E832382AABB00FE14F7 /* airbank-ocr-demo */ = {
-			isa = PBXGroup;
-			children = (
-				A3F35F572E153B3B007BE738 /* PDFSummarizer */,
-				A3F35F4C2E1522B1007BE738 /* MainHomeView.swift */,
-				A3F35F1A2E145AB6007BE738 /* AppTheme.swift */,
-				A3F35F4A2E1522AA007BE738 /* App.swift */,
-				DFAD6E8D2382AABE00FE14F7 /* Assets.xcassets */,
-				DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */,
-				DFAD6E922382AABE00FE14F7 /* Info.plist */,
-				A3F35F172E145AB6007BE738 /* OCR */,
-				A3F35F1C2E145AB6007BE738 /* Shared */,
-			);
-			path = "airbank-ocr-demo";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A37771502E12C179005E6BC5 /* airbank-ocr-demoUITests */ = {
+		A311AB192E16883E00C8B181 /* testOCR-both */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A37771572E12C179005E6BC5 /* Build configuration list for PBXNativeTarget "airbank-ocr-demoUITests" */;
+			buildConfigurationList = A311AB382E16883F00C8B181 /* Build configuration list for PBXNativeTarget "testOCR-both" */;
 			buildPhases = (
-				A377714D2E12C179005E6BC5 /* Sources */,
-				A377714E2E12C179005E6BC5 /* Frameworks */,
-				A377714F2E12C179005E6BC5 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				A37771562E12C179005E6BC5 /* PBXTargetDependency */,
-			);
-			name = "airbank-ocr-demoUITests";
-			packageProductDependencies = (
-			);
-			productName = "airbank-ocr-demoUITests";
-			productReference = A37771512E12C179005E6BC5 /* airbank-ocr-demoUITests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		DFAD6E802382AABB00FE14F7 /* airbank-ocr-demo */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DFAD6E952382AABE00FE14F7 /* Build configuration list for PBXNativeTarget "airbank-ocr-demo" */;
-			buildPhases = (
-				DFAD6E7D2382AABB00FE14F7 /* Sources */,
-				DFAD6E7E2382AABB00FE14F7 /* Frameworks */,
-				DFAD6E7F2382AABB00FE14F7 /* Resources */,
+				A311AB162E16883E00C8B181 /* Sources */,
+				A311AB172E16883E00C8B181 /* Frameworks */,
+				A311AB182E16883E00C8B181 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A3F35F312E145B2F007BE738 /* Processing */,
-				A3F35F572E153B3B007BE738 /* PDFSummarizer */,
+				A311AB1B2E16883E00C8B181 /* testOCR */,
 			);
-			name = "airbank-ocr-demo";
-			productName = "airbank-ocr-demo";
-			productReference = DFAD6E812382AABB00FE14F7 /* airbank-ocr-demo.app */;
+			name = "testOCR-both";
+			packageProductDependencies = (
+				A311AB922E168BF900C8B181 /* StringMetric */,
+			);
+			productName = "testOCR-both";
+			productReference = A311AB1A2E16883E00C8B181 /* testOCR-both.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A311AB252E16883F00C8B181 /* testOCR-bothTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A311AB3B2E16883F00C8B181 /* Build configuration list for PBXNativeTarget "testOCR-bothTests" */;
+			buildPhases = (
+				A311AB222E16883F00C8B181 /* Sources */,
+				A311AB232E16883F00C8B181 /* Frameworks */,
+				A311AB242E16883F00C8B181 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A311AB282E16883F00C8B181 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A311AB292E16883F00C8B181 /* testOCR-bothTests */,
+			);
+			name = "testOCR-bothTests";
+			packageProductDependencies = (
+			);
+			productName = "testOCR-bothTests";
+			productReference = A311AB262E16883F00C8B181 /* testOCR-bothTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A311AB2F2E16883F00C8B181 /* testOCR-bothUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A311AB3E2E16883F00C8B181 /* Build configuration list for PBXNativeTarget "testOCR-bothUITests" */;
+			buildPhases = (
+				A311AB2C2E16883F00C8B181 /* Sources */,
+				A311AB2D2E16883F00C8B181 /* Frameworks */,
+				A311AB2E2E16883F00C8B181 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A311AB322E16883F00C8B181 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A311AB332E16883F00C8B181 /* testOCR-bothUITests */,
+			);
+			name = "testOCR-bothUITests";
+			packageProductDependencies = (
+			);
+			productName = "testOCR-bothUITests";
+			productReference = A311AB302E16883F00C8B181 /* testOCR-bothUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -218,21 +182,24 @@
 		DFAD6E792382AABB00FE14F7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1640;
+				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = "Marek Přidal";
 				TargetAttributes = {
-					A37771502E12C179005E6BC5 = {
-						CreatedOnToolsVersion = 16.4;
-						TestTargetID = DFAD6E802382AABB00FE14F7;
+					A311AB192E16883E00C8B181 = {
+						CreatedOnToolsVersion = 26.0;
 					};
-					DFAD6E802382AABB00FE14F7 = {
-						CreatedOnToolsVersion = 11.2.1;
+					A311AB252E16883F00C8B181 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = A311AB192E16883E00C8B181;
+					};
+					A311AB2F2E16883F00C8B181 = {
+						CreatedOnToolsVersion = 26.0;
+						TestTargetID = A311AB192E16883E00C8B181;
 					};
 				};
 			};
 			buildConfigurationList = DFAD6E7C2382AABB00FE14F7 /* Build configuration list for PBXProject "airbank-ocr-demo" */;
-			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -241,116 +208,182 @@
 			);
 			mainGroup = DFAD6E782382AABB00FE14F7;
 			packageReferences = (
-				A377714A2E12B136005E6BC5 /* XCRemoteSwiftPackageReference "StringMetric" */,
+				A311AB912E168BF100C8B181 /* XCRemoteSwiftPackageReference "StringMetric" */,
 			);
+			preferredProjectObjectVersion = 50;
 			productRefGroup = DFAD6E822382AABB00FE14F7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DFAD6E802382AABB00FE14F7 /* airbank-ocr-demo */,
-				A37771502E12C179005E6BC5 /* airbank-ocr-demoUITests */,
+				A311AB192E16883E00C8B181 /* testOCR-both */,
+				A311AB252E16883F00C8B181 /* testOCR-bothTests */,
+				A311AB2F2E16883F00C8B181 /* testOCR-bothUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		A377714F2E12C179005E6BC5 /* Resources */ = {
+		A311AB182E16883E00C8B181 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DFAD6E7F2382AABB00FE14F7 /* Resources */ = {
+		A311AB242E16883F00C8B181 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DFAD6E912382AABE00FE14F7 /* LaunchScreen.storyboard in Resources */,
-				DFAD6E8E2382AABE00FE14F7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A311AB2E2E16883F00C8B181 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A377714D2E12C179005E6BC5 /* Sources */ = {
+		A311AB162E16883E00C8B181 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DFAD6E7D2382AABB00FE14F7 /* Sources */ = {
+		A311AB222E16883F00C8B181 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A3F35F1F2E145AB6007BE738 /* RecognizedKeyValue.swift in Sources */,
-				A3F35F212E145AB6007BE738 /* AppTheme.swift in Sources */,
-				A3F35F4D2E1522B1007BE738 /* MainHomeView.swift in Sources */,
-				A3F35F222E145AB6007BE738 /* DocumentResultViewController.swift in Sources */,
-				A3F35F232E145AB6007BE738 /* WindowSceneCoordinator.swift in Sources */,
-				A3F35F4B2E1522AA007BE738 /* App.swift in Sources */,
-				A3F35F242E145AB6007BE738 /* ResultCardView.swift in Sources */,
-				A3F35F262E145AB6007BE738 /* TextOverlayView.swift in Sources */,
-				A3F35F272E145AB6007BE738 /* ScanAgainButton.swift in Sources */,
-				A3F35F282E145AB6007BE738 /* HomeViewController.swift in Sources */,
-				A3F35F292E145AB6007BE738 /* HomeMainCardView.swift in Sources */,
-				A3F35F2A2E145AB6007BE738 /* HomeQuickActionsView.swift in Sources */,
-				A3F35F2B2E145AB6007BE738 /* KeyValueTableViewCell.swift in Sources */,
-				A3F35F2D2E145AB6007BE738 /* AppDelegate.swift in Sources */,
-				A3F35F2E2E145AB6007BE738 /* HomeHeaderView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A311AB2C2E16883F00C8B181 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A37771562E12C179005E6BC5 /* PBXTargetDependency */ = {
+		A311AB282E16883F00C8B181 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = DFAD6E802382AABB00FE14F7 /* airbank-ocr-demo */;
-			targetProxy = A37771552E12C179005E6BC5 /* PBXContainerItemProxy */;
+			target = A311AB192E16883E00C8B181 /* testOCR-both */;
+			targetProxy = A311AB272E16883F00C8B181 /* PBXContainerItemProxy */;
+		};
+		A311AB322E16883F00C8B181 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A311AB192E16883E00C8B181 /* testOCR-both */;
+			targetProxy = A311AB312E16883F00C8B181 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		DFAD6E8F2382AABE00FE14F7 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DFAD6E902382AABE00FE14F7 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		A37771582E12C179005E6BC5 /* Debug */ = {
+		A311AB392E16883F00C8B181 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				BUNDLE_LOADER = "$(TEST_HOST)";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.airbank-ocr-demoUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-both";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/airbank-ocr-demo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/airbank-ocr-demo";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Debug;
 		};
-		A37771592E12C179005E6BC5 /* Release */ = {
+		A311AB3A2E16883F00C8B181 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-both";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		A311AB3C2E16883F00C8B181 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -363,15 +396,114 @@
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.airbank-ocr-demoUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-bothTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/airbank-ocr-demo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/airbank-ocr-demo";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/testOCR-both.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/testOCR-both";
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		A311AB3D2E16883F00C8B181 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-bothTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/testOCR-both.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/testOCR-both";
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		A311AB3F2E16883F00C8B181 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-bothUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = "testOCR-both";
+				XROS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		A311AB402E16883F00C8B181 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-bothUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TEST_TARGET_NAME = "testOCR-both";
+				XROS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};
@@ -425,7 +557,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -479,7 +612,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -489,54 +623,32 @@
 			};
 			name = Release;
 		};
-		DFAD6E962382AABE00FE14F7 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
-				INFOPLIST_FILE = "airbank-ocr-demo/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.rosemaryyang.testOCR;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		DFAD6E972382AABE00FE14F7 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
-				INFOPLIST_FILE = "airbank-ocr-demo/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.rosemaryyang.testOCR;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A37771572E12C179005E6BC5 /* Build configuration list for PBXNativeTarget "airbank-ocr-demoUITests" */ = {
+		A311AB382E16883F00C8B181 /* Build configuration list for PBXNativeTarget "testOCR-both" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				A37771582E12C179005E6BC5 /* Debug */,
-				A37771592E12C179005E6BC5 /* Release */,
+				A311AB392E16883F00C8B181 /* Debug */,
+				A311AB3A2E16883F00C8B181 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A311AB3B2E16883F00C8B181 /* Build configuration list for PBXNativeTarget "testOCR-bothTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A311AB3C2E16883F00C8B181 /* Debug */,
+				A311AB3D2E16883F00C8B181 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A311AB3E2E16883F00C8B181 /* Build configuration list for PBXNativeTarget "testOCR-bothUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A311AB3F2E16883F00C8B181 /* Debug */,
+				A311AB402E16883F00C8B181 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -550,19 +662,10 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DFAD6E952382AABE00FE14F7 /* Build configuration list for PBXNativeTarget "airbank-ocr-demo" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DFAD6E962382AABE00FE14F7 /* Debug */,
-				DFAD6E972382AABE00FE14F7 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		A377714A2E12B136005E6BC5 /* XCRemoteSwiftPackageReference "StringMetric" */ = {
+		A311AB912E168BF100C8B181 /* XCRemoteSwiftPackageReference "StringMetric" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/autozimu/StringMetric.swift";
 			requirement = {
@@ -573,9 +676,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A377714B2E12B137005E6BC5 /* StringMetric */ = {
+		A311AB922E168BF900C8B181 /* StringMetric */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A377714A2E12B136005E6BC5 /* XCRemoteSwiftPackageReference "StringMetric" */;
+			package = A311AB912E168BF100C8B181 /* XCRemoteSwiftPackageReference "StringMetric" */;
 			productName = StringMetric;
 		};
 /* End XCSwiftPackageProductDependency section */
