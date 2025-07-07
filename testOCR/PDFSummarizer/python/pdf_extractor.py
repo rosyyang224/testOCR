@@ -9,7 +9,6 @@ def extract_text(path, method="docling"):
         try:
             converter = DocumentConverter()
             result = converter.convert(path)
-            # Tell it to insert your delimiter between pages
             markdown = result.document.export_to_markdown(page_break_placeholder="---PAGE_BREAK---")
             print("Docling markdown with page breaks generated.")
             return markdown
