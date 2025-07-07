@@ -11,6 +11,7 @@ struct PDFSummarizerView: View {
     @State private var showComparison = false
     @State private var extractedPages: [String] = []
     @State private var pageImages: [CGImage] = []
+    @State private var selectedModel: SummarizerModel = .foundation
     
     var body: some View {
         NavigationStack {
@@ -21,6 +22,14 @@ struct PDFSummarizerView: View {
                         Text("PyPDF").tag(false)
                     }
                     .pickerStyle(.segmented)
+                    
+                    Picker("Model", selection: $selectedModel) {
+                        ForEach(SummarizerModel.allCases) { model in
+                            Text(model.rawValue).tag(model)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
                     
                     Button("Select PDF") {
                         showFilePicker = true
@@ -50,16 +59,31 @@ struct PDFSummarizerView: View {
                 }
                 
                 if !summary.isEmpty {
-                    ScrollView([.horizontal, .vertical]) {
-                        Text(summary)
-                            .font(.system(.body, design: .monospaced))
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Summary")
+                            .font(.headline)
+
+                        // Summary – wrapped text
+                        ScrollView {
+                            Text(summary)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+
+                        Text("Extracted Text")
+                            .font(.headline)
+
+                        // Raw text – unwrapped, horizontally scrollable
+                        ScrollView([.vertical, .horizontal]) {
+                            Text(extractedPages.joined(separator: "\n"))
+                                .font(.system(.body, design: .monospaced))
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }
-                    .background(Color.gray.opacity(0.05))
-                    .cornerRadius(10)
                     .padding()
                 }
+
 
                 
                 if showComparison {
@@ -99,16 +123,20 @@ struct PDFSummarizerView: View {
         
         do {
             let method: PDFTextExtractionMethod = useDocling ? .docling : .pypdf
-            
             let chunks = try TextExtractor.extractTextPages(from: file, using: method)
             
             pageImages = PDFPageRenderer.renderPageCGImages(from: file)
             extractedPages = chunks
             
             let fullText = chunks.joined(separator: "\n")
-            let response = try await QwenSummarizer.summarize(text: fullText)
-            
-            summary = response
+
+            switch selectedModel {
+            case .foundation:
+                summary = try await FoundationSummaryClient.summarize(fullText)
+            case .qwen:
+                summary = try await QwenSummaryClient.summarize(fullText)
+            }
+
             showComparison = true
             
         } catch {
