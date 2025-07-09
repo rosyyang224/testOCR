@@ -9,10 +9,15 @@ struct MainHomeView: View {
                     Label("OCR", systemImage: "viewfinder")
                 }
 
-            // Prong 3: PDF Summary
+            // Prong 2: PDF Summary
             PDFSummarizerView()
                 .tabItem {
-                    Label("Summary", systemImage: "doc.plaintext")
+                    Label("PDF", systemImage: "doc.plaintext")
+                }
+            
+            JSONSummarizerView()
+                .tabItem {
+                    Label("Homepage Summary", systemImage: "doc.plaintext")
                 }
 
             // Prong 4: Dynamic Query Interface (placeholder)

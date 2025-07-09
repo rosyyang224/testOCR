@@ -1,27 +1,31 @@
 import SwiftUI
 
 struct JSONSummarizerView: View {
-    @State private var rawJSON: String = "{}"
+    @State private var rawJSON: String = mockJSON
     @State private var summary: String = "Summary will appear here."
     @State private var isProcessing = false
-    @State private var summarizer = FoundationJSONSummarizer()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Raw JSON")
-                .font(.headline)
+            Text("Raw JSON").font(.headline)
+
             TextEditor(text: $rawJSON)
-                .frame(height: 150)
+                .frame(height: 180)
                 .border(Color.gray)
 
             Button("Summarize") {
                 Task {
                     isProcessing = true
-                    summary = await summarizer.summarize(jsonString: rawJSON)
+                    do {
+                        summary = try await FoundationJSONSummarizer.summarize(rawJSON)
+                    } catch {
+                        summary = "Error: \(error.localizedDescription)"
+                    }
                     isProcessing = false
                 }
             }
             .padding()
+            .frame(maxWidth: .infinity)
             .background(Color.blue.opacity(0.8))
             .foregroundColor(.white)
             .cornerRadius(8)
@@ -30,27 +34,16 @@ struct JSONSummarizerView: View {
                 ProgressView()
             }
 
-            Text("Summary")
-                .font(.headline)
+            Text("Summary").font(.headline)
+
             ScrollView {
                 Text(summary)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical)
             }
 
             Spacer()
         }
         .padding()
-        .onAppear {
-            // Optional: listen for JSON pushed from Capacitor
-            NotificationCenter.default.addObserver(forName: .receivedJSON, object: nil, queue: .main) { notification in
-                if let jsonString = notification.object as? String {
-                    self.rawJSON = jsonString
-                }
-            }
-        }
     }
-}
-
-extension Notification.Name {
-    static let receivedJSON = Notification.Name("ReceivedJSONFromJS")
 }
