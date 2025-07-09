@@ -1,52 +1,41 @@
 import SwiftUI
-import Vision
 
 struct ResultCardView: View {
-    @State var tableData: [RecognizedKeyValue]
-    
-    let documentType: String
-    let image: CGImage?
-    let textObservations: [VNRecognizedTextObservation]
-    let showTable: Bool
+    let title: String
+    let subtitle: String?
+    let iconName: String
+    let color: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            Text(documentType)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.primary)
-                .lineLimit(1)
-
+        HStack(alignment: .center, spacing: 12) {
             ZStack {
-                if let image {
-                    Image(decorative: image, scale: 1.0)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 250)
-                        .background(.ultraThinMaterial)
-                        .cornerRadius(12)
+                Circle()
+                    .fill(color.opacity(0.15))
+                    .frame(width: 44, height: 44)
+                Image(systemName: iconName)
+                    .foregroundColor(color)
+                    .font(.system(size: 18, weight: .semibold))
+            }
 
-                    TextOverlay(
-                        observations: textObservations,
-                        additionalBoxes: [],
-                        imageSize: CGSize(width: image.width, height: image.height)
-                    )
-                    .allowsHitTesting(false)
-                } else {
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(.ultraThinMaterial)
-                        .frame(height: 250)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(AppTheme.subtitleFont)
+                    .foregroundColor(AppTheme.titleText)
+                if let subtitle = subtitle {
+                    Text(subtitle)
+                        .font(AppTheme.captionFont)
+                        .foregroundColor(AppTheme.secondaryText)
                 }
             }
 
-            if showTable {
-                KeyValueTableView(keyValuePairs: $tableData)
-                    .frame(maxHeight: 300)
-                    .transition(.opacity)
-            }
+            Spacer()
         }
-        .padding(20)
-        .background(Color.white)
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 4)
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(AppTheme.cardBackground)
+                .shadow(color: AppTheme.cardShadowColor, radius: 6, x: 0, y: 3)
+        )
+        .padding(.horizontal)
     }
 }

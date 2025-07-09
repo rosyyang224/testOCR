@@ -14,14 +14,12 @@ enum FoundationJSONSummarizer {
         let prompt = """
         You are a homepage summarization assistant for a portfolio dashboard.
 
-        Summarize the following JSON data into 2–3 concise sentences for a user-facing homepage.
+        Summarize the following JSON data into 2–3 concise sentences for a user-facing homepage. Be simple and concise.
 
         Focus on:
         - Overall portfolio performance over time
-        - Top performing and underperforming assets
-        - Key holdings and shifts in allocation
-
-        Be simple and concise.
+        - Top performing and underperforming assets (top movers, top losers)
+        - Key holdings
 
         JSON Data:
         \(trimmed)
@@ -36,8 +34,7 @@ enum FoundationJSONSummarizer {
             instructions: Instructions {
                 """
                 You generate short summaries from structured portfolio data (in JSON).
-                Your goal is to help the user quickly understand their portfolio status including top movers, major holdings, and any significant trends.
-                Be concise, insightful, and user-friendly.
+                Your goal is to help the user quickly understand their portfolio status including top movers, major holdings, and any significant trends. 
                 Avoid technical jargon unless necessary.
                 """
             }

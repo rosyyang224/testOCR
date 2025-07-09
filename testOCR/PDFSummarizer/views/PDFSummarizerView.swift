@@ -12,86 +12,26 @@ struct PDFSummarizerView: View {
     @State private var extractedPages: [String] = []
     @State private var pageImages: [CGImage] = []
     @State private var selectedModel: SummarizerModel = .foundation
+    @State private var selectedParser: ParserModel = .docling
+    @State private var dragOver = false
+    @State private var showResults = false
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 20) {
-                if selectedPDFURL == nil {
-                    Picker("Extraction Method", selection: $useDocling) {
-                        Text("Docling").tag(true)
-                        Text("PyPDF").tag(false)
-                    }
-                    .pickerStyle(.segmented)
-
-                    Picker("Model", selection: $selectedModel) {
-                        ForEach(SummarizerModel.allCases) { model in
-                            Text(model.rawValue).tag(model)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-
-                    Button("Select PDF") {
-                        showFilePicker = true
-                    }
-                } else {
-                    Text("Extracted with \(useDocling ? "Docling" : "PyPDF")")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-
-                    Button("Scan Another PDF") {
-                        selectedPDFURL = nil
-                        summary = ""
-                        extractedPages = []
-                        pageImages = []
-                        showComparison = false
+            ScrollView {
+                VStack(spacing: 24) {
+                    headerSection
+                    if !showResults {
+                        mainCard
+                        quickActionsSection
+                    } else {
+                        resultsCard
                     }
                 }
-
-                if isProcessing {
-                    ProgressView("Processing...")
-                }
-
-                if let error = errorMessage {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .multilineTextAlignment(.center)
-                }
-
-                if !summary.isEmpty {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Summary")
-                            .font(.headline)
-
-                        ScrollView {
-                            Text(summary)
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-
-                        Text("Extracted Text")
-                            .font(.headline)
-
-                        ScrollView([.vertical, .horizontal]) {
-                            Text(extractedPages.joined(separator: "\n"))
-                                .font(.system(.body, design: .monospaced))
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .padding()
-                }
-
-                if showComparison {
-                    NavigationLink("Compare Results", destination:
-                        PDFComparisonView(
-                            pageImages: pageImages,
-                            pageTexts: extractedPages
-                        )
-                    )
-                    .padding()
-                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
             }
-            .padding()
+            .background(AppTheme.backgroundColor)
             .fileImporter(
                 isPresented: $showFilePicker,
                 allowedContentTypes: [.pdf],
@@ -109,75 +49,138 @@ struct PDFSummarizerView: View {
             }
         }
     }
-    
-    func cleanHeadersAndFooters(from input: String) -> String {
-        let lines = input.components(separatedBy: .newlines)
 
-        let cleanedLines = lines.filter { line in
-            let trimmed = line.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmed.isEmpty else { return false }
-
-            let patternsToExclude = [
-                #"(?i)^.*morgan stanley.*$"#,
-                #"(?i)^.*private wealth management.*$"#,
-                #"(?i)^.*page \d+ of \d+.*$"#,
-                #"(?i)^.*prr means product risk rating.*$"#,
-                #"(?i)^.*commitment date reporting.*$"#,
-                #"(?i)^.*cVVQ.*portfolio valuation.*$"#,
-                #"(?i)^.*reporting currency.*usd.*$"#,
-                #"(?i)^.*kindly see last page for disclosures.*$"#,
-
-                #"(?i)^\s*internal use only\s*$"#,
-                #"(?i)^\+\s+denotes upward revision of prr\s*$"#,
-                #"(?i)^\*\s+denotes bank no longer risk rate this product\s*$"#,
-
-                #"(?i)^cVVQ\s+[A-Z0-9\.]+$"#,
-                #"(?i)^[A-Z]{5,}\s+[A-Z0-9\.]{10,}$"#,
-                #"^\|?[-| ]{20,}\|?$"#
-            ]
-
-
-            for pattern in patternsToExclude {
-                if let _ = trimmed.range(of: pattern, options: [.regularExpression, .caseInsensitive]) {
-                    return false
-                }
+    private var headerSection: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(AppTheme.primaryGradient)
+                    .frame(width: 80, height: 80)
+                    .shadow(color: AppTheme.primaryColor.opacity(0.3), radius: 8, x: 0, y: 4)
+                Image(systemName: "doc.fill")
+                    .font(.system(size: 36, weight: .medium))
+                    .foregroundColor(.white)
             }
+            .scaleEffect(isProcessing ? 1.1 : 1.0)
+            .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: isProcessing)
 
-            return true
+            VStack(spacing: 4) {
+                Text("PDF Summarizer")
+                    .font(AppTheme.titleFont)
+                    .foregroundColor(AppTheme.titleText)
+
+                Text("Upload and summarize PDF documents instantly")
+                    .font(AppTheme.bodyFont)
+                    .foregroundColor(AppTheme.secondaryText)
+                    .multilineTextAlignment(.center)
+            }
         }
-
-        return cleanedLines.joined(separator: "\n")
     }
 
-
-    func process(_ file: URL) async {
-        isProcessing = true
-        errorMessage = nil
-        summary = ""
-        showComparison = false
-
-        do {
-            let method: PDFTextExtractionMethod = useDocling ? .docling : .pypdf
-            let chunks = try TextExtractor.extractTextPages(from: file, using: method)
-
-            pageImages = PDFPageRenderer.renderPageCGImages(from: file)
-            extractedPages = chunks
-
-            let cleanedChunks = chunks.map { cleanHeadersAndFooters(from: $0) }
-
-            switch selectedModel {
-            case .foundation:
-                summary = try await FoundationSummaryClient.summarize(cleanedChunks)
-            case .qwen:
-                let fullText = cleanedChunks.joined(separator: "\n\n")
-                summary = try await QwenSummaryClient.summarize(fullText)
-            }
-
-            showComparison = true
-        } catch {
-            errorMessage = error.localizedDescription
+    private var mainCard: some View {
+        VStack(spacing: 24) {
+            uploadArea
+            settingsSection
+            actionButton
         }
+        .padding(24)
+        .modifier(AppTheme.cardStyle())
+    }
 
+    private var uploadArea: some View {
+        VStack(spacing: 16) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        dragOver ? AppTheme.primaryColor : AppTheme.mediumGray,
+                        style: StrokeStyle(lineWidth: 2, dash: [8, 4])
+                    )
+                    .background(dragOver ? AppTheme.primaryColor.opacity(0.05) : Color.clear)
+                    .frame(height: 120)
+                    .animation(.easeInOut(duration: 0.2), value: dragOver)
+
+                VStack(spacing: 12) {
+                    Image(systemName: "doc.text.fill")
+                        .font(.system(size: 32))
+                        .foregroundColor(AppTheme.primaryColor)
+                    Text("Drop PDF here or tap below to select")
+                        .font(AppTheme.bodyFont)
+                        .foregroundColor(AppTheme.secondaryText)
+                }
+            }
+        }
+    }
+
+    private var settingsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Summarization Settings")
+                .font(AppTheme.subtitleFont)
+                .foregroundColor(AppTheme.primaryText)
+
+            CustomModelSelector(selectedModel: $selectedModel)
+
+            CustomParserSelector(selectedParser: $selectedParser)
+        }
+    }
+
+    private var actionButton: some View {
+        Button(action: {
+            showFilePicker = true
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: "arrow.up.doc.fill")
+                Text("Summarize PDF")
+            }
+        }
+        .modifier(AppTheme.primaryButtonStyle())
+        .disabled(isProcessing)
+    }
+
+    private var quickActionsSection: some View {
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
+                Button(action: {
+                    summary = ""
+                    showResults = false
+                }) {
+                    Label("Clear", systemImage: "xmark.circle")
+                }
+                .modifier(AppTheme.secondaryButtonStyle())
+
+                Button(action: {
+                    showComparison = true
+                }) {
+                    Label("Compare", systemImage: "doc.text.magnifyingglass")
+                }
+                .modifier(AppTheme.secondaryButtonStyle())
+            }
+        }
+    }
+
+    private var resultsCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Summary")
+                .font(AppTheme.titleFont)
+                .foregroundColor(AppTheme.titleText)
+
+            Text(summary)
+                .font(AppTheme.bodyFont)
+                .foregroundColor(AppTheme.primaryText)
+                .padding()
+                .background(AppTheme.cardBackground)
+                .cornerRadius(12)
+        }
+        .padding(24)
+        .modifier(AppTheme.cardStyle())
+    }
+
+    private func process(_ url: URL) async {
+        isProcessing = true
+        summary = "Processing..."
+        // Simulate summary result
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        summary = "Summary of uploaded PDF will appear here."
         isProcessing = false
+        showResults = true
     }
 }

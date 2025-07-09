@@ -11,7 +11,7 @@ struct DocumentResultView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 16) {
                 if isImageVisible {
                     ZStack {
                         GeometryReader { geo in
@@ -24,41 +24,73 @@ struct DocumentResultView: View {
                                     TextOverlayBox(observations: keyValuePairs.compactMap { $0.keyTextObservation })
                                 )
                         }
-                        .frame(height: 250) // same height as before
+                        .frame(height: 240)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: AppTheme.cardShadowColor, radius: 8, x: 0, y: 4)
                     }
                 }
 
-                Text("Detected: \(detectedDocumentType)")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
+                ResultCardView(
+                    title: "Detected Document",
+                    subtitle: detectedDocumentType,
+                    iconName: "doc.text.magnifyingglass",
+                    color: AppTheme.accentColor
+                )
 
                 if !keyValuePairs.isEmpty {
-                    ForEach(keyValuePairs, id: \.key) { pair in
-                        KeyValueRowView(key: pair.key, value: pair.value ?? "")
-                            .padding(.horizontal)
-                    }
+                    KeyValueTableView(
+                        keyValuePairs: $keyValuePairs,
+                        onValueChanged: { index, newValue in
+                            keyValuePairs[index].value = newValue
+                        }
+                    )
+                    .padding(.top, 8)
                 }
+                
+                Button(action: saveToJSON) {
+                    Text("Save")
+                }
+                .modifier(AppTheme.primaryButtonStyle())
 
-                Button("Scan Another") {
+
+                ScanAgainButton(title: "Scan Another") {
                     dismiss()
                 }
-                .buttonStyle(.borderedProminent)
-                .padding()
 
                 Button(isImageVisible ? "Hide Image" : "Show Image") {
-                    isImageVisible.toggle()
+                    withAnimation { isImageVisible.toggle() }
                 }
-                .padding(.top, 8)
+                .font(AppTheme.captionFont)
+                .foregroundColor(AppTheme.accentColor)
+                .padding(.top, 4)
             }
-            .padding(.top)
+            .padding()
         }
+        .background(AppTheme.backgroundColor.ignoresSafeArea())
         .onAppear {
             runFullOCR(on: image)
         }
     }
+    
+    private func saveToJSON() {
+        var idCardDict: [String: String] = [:]
 
-    // MARK: - Vision OCR Logic
+        for pair in keyValuePairs {
+            if let value = pair.value {
+                idCardDict[pair.key] = value
+            }
+        }
+
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: idCardDict, options: .prettyPrinted)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                print("Saved ID Card JSON:\n\(jsonString)")
+            }
+        } catch {
+            print("Error encoding ID card to JSON: \(error)")
+        }
+    }
+
     private func runFullOCR(on cgImage: CGImage) {
         let rectangleRequest = VNDetectRectanglesRequest { request, _ in
             if let rect = request.results?.first as? VNRectangleObservation {
@@ -99,13 +131,13 @@ struct DocumentResultView: View {
                let parsed = PassportMRZParser.parse(lines: parsedLines.map { $0.text }) {
                 docType = "Passport (MRZ)"
                 extractedPairs = [
-                    .init(key: "SURNAME", value: parsed.surname, keyTextObservation: nil, valueTextObservation: nil),
-                    .init(key: "GIVEN NAMES", value: parsed.givenNames, keyTextObservation: nil, valueTextObservation: nil),
-                    .init(key: "PASSPORT NO", value: parsed.passportNumber, keyTextObservation: nil, valueTextObservation: nil),
-                    .init(key: "DATE OF BIRTH", value: parsed.dateOfBirth, keyTextObservation: nil, valueTextObservation: nil),
-                    .init(key: "NATIONALITY", value: parsed.nationality, keyTextObservation: nil, valueTextObservation: nil),
-                    .init(key: "SEX", value: parsed.sex, keyTextObservation: nil, valueTextObservation: nil),
-                    .init(key: "DATE OF EXPIRY", value: parsed.expirationDate, keyTextObservation: nil, valueTextObservation: nil)
+                    .init(key: "SURNAME", value: parsed.surname),
+                    .init(key: "GIVEN NAMES", value: parsed.givenNames),
+                    .init(key: "PASSPORT NO", value: parsed.passportNumber),
+                    .init(key: "DATE OF BIRTH", value: parsed.dateOfBirth),
+                    .init(key: "NATIONALITY", value: parsed.nationality),
+                    .init(key: "SEX", value: parsed.sex),
+                    .init(key: "DATE OF EXPIRY", value: parsed.expirationDate)
                 ]
             } else {
                 docType = "ID Card"
