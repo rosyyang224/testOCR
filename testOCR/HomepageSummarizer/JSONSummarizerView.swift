@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct JSONSummarizerView: View {
-    @State private var rawJSON: String = mockJSON
+    @State private var rawJSON: String = mockData
     @State private var summary: String = "Summary will appear here."
     @State private var isProcessing = false
 
