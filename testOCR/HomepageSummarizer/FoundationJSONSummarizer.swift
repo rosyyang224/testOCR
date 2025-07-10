@@ -32,37 +32,90 @@ enum FoundationJSONSummarizer {
         print("Injected focusContext into prompt:\n\(focusContext)")
 
         let sectionedChunks = try JSONChunker.chunkJSON(trimmed)
-        var allSummaries: [String] = []
+        
+        
+//        var allSummaries: [String] = []
+//        let summarizationStart = Date()
+//
+//        for section in sectionedChunks {
+//            print("New top-level section: \(section.key)")
+//
+//            var session = try await makeSession(for: section.key, focusContext: focusContext)
+//            var cumulativePromptSize = 0
+//
+//            for (index, chunk) in section.chunks.enumerated() {
+//                let prompt = """
+//                Summarize this chunk of \(section.key):
+//                \(chunk)
+//                """
+//
+//                let promptSize = prompt.count
+//                cumulativePromptSize += promptSize
+//
+//                print("[\(section.key) - Chunk \(index + 1)] Prompt size: \(promptSize), Cumulative: \(cumulativePromptSize)")
+//
+//                if index > 0 && cumulativePromptSize > 4000 {
+//                    print("Resetting session for \(section.key) at chunk \(index + 1) due to cumulative size.")
+//                    session = try await makeSession(for: section.key, focusContext: focusContext)
+//                    cumulativePromptSize = promptSize
+//                }
+//
+//                let result = try await session.respond(to: prompt)
+//                print("Summary for \(section.key) chunk #\(index + 1)")
+//                allSummaries.append(result.content)
+//            }
+//        }
+//        let summarizationEnd = Date()
+//        let summarizationDuration = summarizationEnd.timeIntervalSince(summarizationStart)
+//        print("Chunk-level summarization took \(String(format: "%.2f", summarizationDuration)) seconds.")
 
-        for section in sectionedChunks {
-            print("New top-level section: \(section.key)")
+        
+        var orderedAllSummaries = Array(repeating: [String](), count: sectionedChunks.count)
+        let summarizationStart = Date()
 
-            var session = try await makeSession(for: section.key, focusContext: focusContext)
-            var cumulativePromptSize = 0
+        try await withThrowingTaskGroup(of: (Int, [String]).self) { sectionGroup in
+            for (sectionIndex, section) in sectionedChunks.enumerated() {
+                sectionGroup.addTask {
+                    print("New top-level section: \(section.key)")
 
-            for (index, chunk) in section.chunks.enumerated() {
-                let prompt = """
-                Summarize this chunk of \(section.key):
-                \(chunk)
-                """
+                    let chunkSummaries = try await withThrowingTaskGroup(of: (Int, String).self) { chunkGroup in
+                        for (chunkIndex, chunk) in section.chunks.enumerated() {
+                            chunkGroup.addTask {
+                                let session = try await makeSession(for: section.key, focusContext: focusContext)
 
-                let promptSize = prompt.count
-                cumulativePromptSize += promptSize
+                                let prompt = """
+                                Summarize this chunk of \(section.key):
+                                \(chunk)
+                                """
 
-                print("[\(section.key) - Chunk \(index + 1)] Prompt size: \(promptSize), Cumulative: \(cumulativePromptSize)")
+                                print("[\(section.key) - Chunk \(chunkIndex + 1)] Prompt size: \(prompt.count)")
+                                let result = try await session.respond(to: prompt)
+                                return (chunkIndex, result.content)
+                            }
+                        }
 
-                if index > 0 && cumulativePromptSize > 4000 {
-                    print("Resetting session for \(section.key) at chunk \(index + 1) due to cumulative size.")
-                    session = try await makeSession(for: section.key, focusContext: focusContext)
-                    cumulativePromptSize = promptSize
+                        var ordered = Array(repeating: "", count: section.chunks.count)
+                        for try await (chunkIndex, summary) in chunkGroup {
+                            ordered[chunkIndex] = summary
+                        }
+                        return ordered
+                    }
+
+                    return (sectionIndex, chunkSummaries)
                 }
+            }
 
-                let result = try await session.respond(to: prompt)
-                print("Summary for \(section.key) chunk #\(index + 1)")
-                allSummaries.append(result.content)
+            for try await (sectionIndex, chunkSummaries) in sectionGroup {
+                orderedAllSummaries[sectionIndex] = chunkSummaries
             }
         }
+        
+        let summarizationEnd = Date()
+        let summarizationDuration = summarizationEnd.timeIntervalSince(summarizationStart)
+        print("Chunk-level summarization took \(String(format: "%.2f", summarizationDuration)) seconds.")
 
+        let allSummaries = orderedAllSummaries.flatMap { $0 }
+//
         let summaryText = allSummaries.joined(separator: "\n\n")
 
         print("Clearing context for final summary aggregation...")
@@ -76,7 +129,7 @@ enum FoundationJSONSummarizer {
         """
 
         let finalResult = try await finalSession.respond(to: finalPrompt)
-        print("🏁 Final summary generated.")
+        print("Final summary generated.")
         return finalResult.content
     }
 
