@@ -1,41 +1,83 @@
+//
+//  FoundationJSONSummarizer.swift
+//
+
 import Foundation
 import FoundationModels
 
 enum FoundationJSONSummarizer {
-    /// Summarizes a single JSON string into a brief homepage summary.
     static func summarize(_ jsonBlob: String) async throws -> String {
-        let session = try await createOptimizedSession()
-
         let trimmed = jsonBlob.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             return "Input JSON is empty."
         }
 
-        let prompt = """
-        You are a homepage summarization assistant for a portfolio dashboard.
+        let sectionedChunks = try JSONChunker.chunkJSON(trimmed)
+        var allSummaries: [String] = []
 
-        Summarize the following JSON data into 2–3 concise sentences for a user-facing homepage. Be simple and concise.
+        for section in sectionedChunks {
+            print("New top-level section: \(section.key)")
 
-        Focus on:
-        - Overall portfolio performance over time
-        - Top performing and underperforming assets (top movers, top losers)
-        - Key holdings
+            var session = try await makeSession(for: section.key)
+            var cumulativePromptSize = 0
 
-        JSON Data:
-        \(trimmed)
+            for (index, chunk) in section.chunks.enumerated() {
+                let prompt = """
+                Summarize this chunk of \(section.key):
+                \(chunk)
+                """
+
+                let promptSize = prompt.count
+                cumulativePromptSize += promptSize
+
+                print("[\(section.key) - Chunk \(index + 1)] Prompt size: \(promptSize), Cumulative: \(cumulativePromptSize)")
+
+                if index > 0 && cumulativePromptSize > 4000 {
+                    print("Resetting session for \(section.key) at chunk \(index + 1) due to cumulative size.")
+                    session = try await makeSession(for: section.key)
+                    cumulativePromptSize = promptSize
+                }
+
+                let result = try await session.respond(to: prompt)
+                print("Summary for \(section.key) chunk #\(index + 1)")
+                allSummaries.append(result.content)
+            }
+        }
+
+        // Final pass: summarize all section summaries
+        let summaryText = allSummaries.joined(separator: "\n\n")
+
+        print("Clearing context for final summary aggregation...")
+        let finalSession = try await makeFinalAggregationSession()
+
+        print("Final aggregation of \(allSummaries.count) summaries...")
+
+        let finalPrompt = """
+        Summarize the following section summaries into a single dashboard-level overview:
+        \(summaryText)
         """
 
-        let result = try await session.respond(to: prompt)
-        return result.content
+        let finalResult = try await finalSession.respond(to: finalPrompt)
+        print("🏁 Final summary generated.")
+        return finalResult.content
     }
 
-    private static func createOptimizedSession() async throws -> LanguageModelSession {
+    private static func makeSession(for sectionKey: String) async throws -> LanguageModelSession {
+        try await LanguageModelSession(
+            instructions: Instructions {
+                "Summarize \(sectionKey) data for a portfolio dashboard. Eliminate bullet points and any other formatting."
+                "Focus on key metrics, trends, and important details in each chunk. Be concise. Do not add any other information."
+            }
+        )
+    }
+
+    private static func makeFinalAggregationSession() async throws -> LanguageModelSession {
         try await LanguageModelSession(
             instructions: Instructions {
                 """
-                You generate short summaries from structured portfolio data (in JSON).
-                Your goal is to help the user quickly understand their portfolio status including top movers, major holdings, and any significant trends. 
-                Avoid technical jargon unless necessary.
+                You are summarizing multiple section-level summaries from a portfolio dashboard.
+                Your goal is to extract high-level, concise insights across all data (portfolio value, transactions, holdings).
+                Avoid repetition and focus on top insights for a user-facing summary.
                 """
             }
         )
