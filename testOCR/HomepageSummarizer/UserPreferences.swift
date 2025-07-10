@@ -10,9 +10,9 @@ struct AdaptiveConfig {
     let engagementThreshold: Double
 
     static let financial = AdaptiveConfig(
-        baseTopN: 3,
-        minTopN: 2,
-        maxTopN: 8,
+        baseTopN: 1,
+        minTopN: 1,
+        maxTopN: 4,
         significanceThreshold: 0.15,
         diversityBoost: 0.25,
         engagementThreshold: 2.0
@@ -98,11 +98,15 @@ class UserPreferences {
             }
 
             let key = subsection != nil ? "\(section!) → \(subsection!)" : section!
+
             result[key, default: 0] += weight
         }
+        
+        let collapsed = result.map { UserFocusScore(topic: $0.key, score: $0.value) }
 
-        return result.map { UserFocusScore(topic: $0.key, score: $0.value) }
+        return collapsed
     }
+
 
     private static func normalizeScores(_ scores: [UserFocusScore]) -> [UserFocusScore] {
         guard let max = scores.map({ $0.score }).max(), max > 0 else { return scores }
@@ -174,20 +178,26 @@ class UserPreferences {
 
     private static func applyAdaptiveSelection(scores: [UserFocusScore], targetCount: Int) -> [UserFocusScore] {
         guard scores.count > targetCount else { return scores }
+
         var selected = Array(scores.prefix(targetCount / 2).filter { $0.score >= config.significanceThreshold })
 
-        var existingSections = Set(selected.map { $0.topic.components(separatedBy: " → ").first ?? $0.topic })
+        var selectedTopics = Set(selected.map { $0.topic })
 
-        for score in scores {
+        let remainingScores = scores.filter { !selectedTopics.contains($0.topic) }
+        
+        for score in remainingScores {
             if selected.count >= targetCount { break }
-            let section = score.topic.components(separatedBy: " → ").first ?? score.topic
-            let diversityBoost = existingSections.contains(section) ? 1.0 : (1.0 + config.diversityBoost)
+            let topic = score.topic
+            let isDuplicate = selectedTopics.contains(topic)
+            let diversityBoost = isDuplicate ? 1.0 : (1.0 + config.diversityBoost)
             let adjusted = score.score * diversityBoost
-            if adjusted >= config.significanceThreshold * 0.7 || !existingSections.contains(section) {
+
+            if adjusted >= config.significanceThreshold * 0.7 || !isDuplicate {
                 selected.append(score)
-                existingSections.insert(section)
+                selectedTopics.insert(topic)
             }
         }
+
         return selected.sorted(by: >)
     }
 

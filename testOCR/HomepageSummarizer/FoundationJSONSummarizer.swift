@@ -20,9 +20,7 @@ enum FoundationJSONSummarizer {
         let topFocus = focus.map { "\($0.topic)" }.joined(separator: ", ")
 
         let focusContext = """
-        You are summarizing a portfolio dashboard for a user. Based on their recent activity, the user appears most interested in:
-
-        \(topFocus)
+        You are summarizing a portfolio dashboard for a user. Based on their recent activity, the user appears most interested in: \(topFocus)
 
         When summarizing the data, prioritize these sections and provide additional insight or granularity for them. Use your judgment to omit or shorten sections the user has shown no interest in.
         """
