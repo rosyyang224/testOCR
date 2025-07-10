@@ -21,20 +21,10 @@ struct MainHomeView: View {
                 }
 
             // Prong 4: Dynamic Query Interface (placeholder)
-            QueryInterfaceView()
+            DynamicQueryView()
                 .tabItem {
                     Label("Query", systemImage: "questionmark.circle")
                 }
-        }
-    }
-}
-
-struct QueryInterfaceView: View {
-    var body: some View {
-        VStack {
-            Text("Query Interface Coming Soon")
-                .font(.title)
-                .padding()
         }
     }
 }
