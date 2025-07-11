@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.so
 *.dylib
-/coreml-OpenELM-3B-Instruct/
+coreml-OpenELM-3B-Instruct/
 llms/qwen2.5-0.5b/
-/Anemll/
+Anemll/
+Data/
