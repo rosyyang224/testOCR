@@ -21,7 +21,7 @@ struct MainHomeView: View {
                 }
 
             // Prong 4: Dynamic Query Interface (placeholder)
-            DynamicQueryView()
+            QueryView()
                 .tabItem {
                     Label("Query", systemImage: "questionmark.circle")
                 }
