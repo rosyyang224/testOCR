@@ -59,7 +59,7 @@ class QueryLanguageSession {
         }
         
         let tools: [any Tool] = [
-            SmartHoldingsTool(isSessionStart: true)
+            getHoldingsTool(isSessionStart: true)
         ]
         
         let instructions = buildSessionInstructions()
@@ -72,7 +72,7 @@ class QueryLanguageSession {
         estimatedContextSize = estimateTokenCount(instructions)
         
         if sessionAttempts > 1 {
-            print("🔄 Session recreated with conversation continuity")
+            print("Session recreated with conversation continuity")
         }
     }
     
@@ -81,9 +81,9 @@ class QueryLanguageSession {
         let context = ContextManager.shared.getOptimizedContext()
         
         var instructions = """
-        You are a helpful financial assistant. ALWAYS use the getHoldings tool to answer questions about portfolio holdings.
+        You are a helpful financial assistant. ALWAYS use the getHoldings tool to answer questions about portfolio holdings. 
 
-        CRITICAL: For ANY question about holdings, positions, stocks, bonds, or investments, you MUST call the getHoldings tool.
+        CRITICAL: You MUST not give any advice on how to manage stocks. You can ONLY base analysis from portfolio data.
 
         \(context.toolInstructions)
 
@@ -308,26 +308,6 @@ class QueryLanguageSession {
         - Context estimate: \(currentEstimate)
         - First interaction: \(isFirstInteraction)
         """
-    }
-    
-    /// Test with sample queries
-    func runQuickTests() async {
-        let testQueries = [
-            "Do I have Apple?",
-            "What's my best performing stock?",
-            "Show me my bonds"
-        ]
-        
-        print("🧪 Running quick tests...")
-        
-        for query in testQueries {
-            do {
-                let result = try await send(query)
-                print("✅ '\(query)' → \(result.count) chars")
-            } catch {
-                print("❌ '\(query)' → \(error)")
-            }
-        }
     }
     
     /// Clear conversation history (fresh start)
