@@ -1,4 +1,3 @@
-// Shared/JSONAnalysisUtils.swift
 import Foundation
 
 enum JSONAnalysisUtils {
