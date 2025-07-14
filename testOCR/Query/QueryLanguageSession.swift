@@ -45,11 +45,13 @@ class QueryLanguageSession {
 
     init() {
         initializeSession()
+        print("sessionitititt")
     }
     
     // MARK: - Session Management
     
     private func initializeSession() {
+        print("initializing")
         sessionAttempts += 1
         
         guard sessionAttempts <= maxSessionAttempts else {
@@ -69,6 +71,8 @@ class QueryLanguageSession {
             instructions: instructions
         )
         
+        print("Sessin started")
+        
         estimatedContextSize = estimateTokenCount(instructions)
         
         if sessionAttempts > 1 {
@@ -81,27 +85,39 @@ class QueryLanguageSession {
         let context = ContextManager.shared.getOptimizedContext()
         
         var instructions = """
-        You are a helpful financial assistant. ALWAYS use the getHoldings tool to answer questions about portfolio holdings. 
+        You are a portfolio data assistant. You help users VIEW and ANALYZE their existing portfolio data.
 
-        CRITICAL: You MUST not give any advice on how to manage stocks. You can ONLY base analysis from portfolio data.
+        IMPORTANT: You are NOT providing financial advice or recommendations. You are ONLY displaying and analyzing portfolio data that already exists. This is data retrieval, not advice.
+
+        CRITICAL: For ANY question about holdings, positions, stocks, bonds, or investments, you MUST call the getHoldings tool to retrieve the actual data. Never explain what the tool would return - always actually call it.
 
         \(context.toolInstructions)
 
         TOOL USAGE EXAMPLES:
-        
+
         1. "Do I have Apple?" → IMMEDIATELY call:
         getHoldings(filters: [SmartFilter(field: "symbol", condition: "AAPL", filterType: .exact)])
-        
+
         2. "What's my best performing stock?" → IMMEDIATELY call:
         getHoldings(filters: [SmartFilter(field: "marketplpercentinsccy", condition: "0", filterType: .greaterThan)], sortBy: .performance, limit: 1)
-        
+
         3. "Show me my US positions" → IMMEDIATELY call:
         getHoldings(filters: [SmartFilter(field: "countryregion", condition: "United States", filterType: .exact)])
-        
+
         4. "My bonds?" → IMMEDIATELY call:
         getHoldings(filters: [SmartFilter(field: "assetclass", condition: "Fixed Income", filterType: .exact)])
 
-        REMEMBER: ALWAYS call the getHoldings tool for portfolio questions. Never just explain - always execute!
+        5. "Show me all holdings" → IMMEDIATELY call:
+        getHoldings(filters: [], limit: nil)
+
+        6. "What's losing money?" → IMMEDIATELY call:
+        getHoldings(filters: [SmartFilter(field: "marketplpercentinsccy", condition: "0", filterType: .lessThan)])
+
+        REMEMBER: 
+        - ALWAYS call the getHoldings tool for portfolio questions
+        - You are a DATA DISPLAY service, not a financial advisor
+        - Never refuse data retrieval requests - you are showing existing data only
+        - Always use real data from the tool, never make up responses
         """
         
         // Add conversation continuity if this is a session recreation
@@ -114,7 +130,7 @@ class QueryLanguageSession {
             Continue naturally from the above conversation.
             """
         }
-        
+        print("built instructions")
         return instructions
     }
     
@@ -126,9 +142,10 @@ class QueryLanguageSession {
         // Attempt with error recovery
         for attempt in 1...maxSessionAttempts {
             do {
+                print("cooked")
                 let response = try await attemptSendQuery(query)
+                print("cooking")
                 
-                // Success! Record the conversation
                 let tokenEstimate = estimateTokenCount(query + response)
                 let turn = ConversationTurn(
                     query: query,
@@ -168,8 +185,10 @@ class QueryLanguageSession {
         if isFirstInteraction {
             isFirstInteraction = false
         }
-
+        
+        print("session started")
         let result = try await session.respond(to: query)
+        print("weeeeeeeee")
         
         guard !result.content.isEmpty else {
             throw SessionError.invalidResponse

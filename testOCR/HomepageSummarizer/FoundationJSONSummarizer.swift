@@ -7,13 +7,20 @@ import FoundationModels
 
 enum FoundationJSONSummarizer {
     static func summarize(_ jsonBlob: String) async throws -> String {
+        print("Starting summarization pipeline...")
         let trimmed = jsonBlob.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             return "Input JSON is empty."
         }
 
-        // Inject user focus here
-        let userData = try JSONDecoder().decode(RawUserData.self, from: Data(mockUserData.utf8))
+        let userData: RawUserData
+            do {
+                print("Decoding user data...")
+                userData = try JSONDecoder().decode(RawUserData.self, from: Data(mockUserData.utf8))
+            } catch {
+                print("Failed to decode user data: \(error)")
+                throw error
+            }
         let latestDate = userData.events.compactMap { $0.date }.max() ?? Date()
         let focus = UserPreferences.getUserFocusSummary(from: userData.events, referenceDate: latestDate)
 
@@ -28,7 +35,8 @@ enum FoundationJSONSummarizer {
         print("User preferences computed:")
         focus.forEach { print(" - \($0.topic): \(String(format: "%.4f", $0.score))") }
         print("Injected focusContext into prompt:\n\(focusContext)")
-
+        
+        print("Chunking JSON input...")
         let sectionedChunks = try JSONChunker.chunkJSON(trimmed)
         
         
@@ -71,53 +79,65 @@ enum FoundationJSONSummarizer {
         var orderedAllSummaries = Array(repeating: [String](), count: sectionedChunks.count)
         let summarizationStart = Date()
 
-        try await withThrowingTaskGroup(of: (Int, [String]).self) { sectionGroup in
-            for (sectionIndex, section) in sectionedChunks.enumerated() {
-                sectionGroup.addTask {
-                    print("New top-level section: \(section.key)")
+        do {
+                try await withThrowingTaskGroup(of: (Int, [String]).self) { sectionGroup in
+                    for (sectionIndex, section) in sectionedChunks.enumerated() {
+                        sectionGroup.addTask {
+                            print("New top-level section: \(section.key)")
 
-                    let chunkSummaries = try await withThrowingTaskGroup(of: (Int, String).self) { chunkGroup in
-                        for (chunkIndex, chunk) in section.chunks.enumerated() {
-                            chunkGroup.addTask {
-                                let session = try await makeSession(for: section.key, focusContext: focusContext)
+                            let chunkSummaries = try await withThrowingTaskGroup(of: (Int, String).self) { chunkGroup in
+                                for (chunkIndex, chunk) in section.chunks.enumerated() {
+                                    chunkGroup.addTask {
+                                        let session = try await makeSession(for: section.key, focusContext: focusContext)
 
-                                let prompt = """
-                                Summarize this chunk of \(section.key):
-                                \(chunk)
-                                """
+                                        let prompt = """
+                                        Summarize this chunk of \(section.key):
+                                        \(chunk)
+                                        """
 
-                                print("[\(section.key) - Chunk \(chunkIndex + 1)] Prompt size: \(prompt.count)")
-                                let result = try await session.respond(to: prompt)
-                                return (chunkIndex, result.content)
+                                        print("[\(section.key) - Chunk \(chunkIndex + 1)] Prompt size: \(prompt.count)")
+                                        let result = try await session.respond(to: prompt)
+                                        return (chunkIndex, result.content)
+                                    }
+                                }
+
+                                var ordered = Array(repeating: "", count: section.chunks.count)
+                                for try await (chunkIndex, summary) in chunkGroup {
+                                    ordered[chunkIndex] = summary
+                                }
+                                return ordered
                             }
-                        }
 
-                        var ordered = Array(repeating: "", count: section.chunks.count)
-                        for try await (chunkIndex, summary) in chunkGroup {
-                            ordered[chunkIndex] = summary
+                            return (sectionIndex, chunkSummaries)
                         }
-                        return ordered
                     }
 
-                    return (sectionIndex, chunkSummaries)
+                    for try await (sectionIndex, chunkSummaries) in sectionGroup {
+                        orderedAllSummaries[sectionIndex] = chunkSummaries
+                    }
                 }
+            } catch {
+                print("Error during chunk-level summarization: \(error)")
+                throw error
             }
-
-            for try await (sectionIndex, chunkSummaries) in sectionGroup {
-                orderedAllSummaries[sectionIndex] = chunkSummaries
-            }
-        }
         
         let summarizationEnd = Date()
         let summarizationDuration = summarizationEnd.timeIntervalSince(summarizationStart)
         print("Chunk-level summarization took \(String(format: "%.2f", summarizationDuration)) seconds.")
 
         let allSummaries = orderedAllSummaries.flatMap { $0 }
-//
+
         let summaryText = allSummaries.joined(separator: "\n\n")
 
         print("Clearing context for final summary aggregation...")
-        let finalSession = try await makeFinalAggregationSession()
+        
+        let finalSession: LanguageModelSession
+            do {
+                finalSession = try await makeFinalAggregationSession()
+            } catch {
+                print("Failed to create final aggregation session: \(error)")
+                throw error
+            }
 
         print("Final aggregation of \(allSummaries.count) summaries...")
 
@@ -126,9 +146,14 @@ enum FoundationJSONSummarizer {
         \(summaryText)
         """
 
-        let finalResult = try await finalSession.respond(to: finalPrompt)
-        print("Final summary generated.")
-        return finalResult.content
+        do {
+            let finalResult = try await finalSession.respond(to: finalPrompt)
+            print("Final summary generated.")
+            return finalResult.content
+        } catch {
+            print("Final summarization step failed: \(error)")
+            throw error
+        }
     }
 
     private static func makeSession(for sectionKey: String, focusContext: String) async throws -> LanguageModelSession {
@@ -137,8 +162,7 @@ enum FoundationJSONSummarizer {
                 """
                 \(focusContext)
 
-                Summarize \(sectionKey) data for a portfolio dashboard. Eliminate bullet points and any other formatting.
-                Focus on key metrics, trends, and important details in each chunk. Be concise. Do not add any other information.
+                Summarize \(sectionKey) data for a portfolio dashboard. Eliminate bullet points and any other formatting. Be concise.
                 """
             }
         )
