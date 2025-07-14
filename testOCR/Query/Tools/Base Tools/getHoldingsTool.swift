@@ -13,6 +13,7 @@ struct getHoldingsTool: Tool {
     let description: String
     
     init(userContext: UserContext = UserContext(), isSessionStart: Bool = false) {
+        print("callingtool")
         var desc: String
         
         if isSessionStart {
@@ -55,6 +56,7 @@ struct getHoldingsTool: Tool {
         }
         
         self.description = desc
+        print("hiiiiiiii")
     }
     
     struct UserContext {

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		A311AB932E168BF900C8B181 /* StringMetric in Frameworks */ = {isa = PBXBuildFile; productRef = A311AB922E168BF900C8B181 /* StringMetric */; };
-		A36CD4342E1B7AEB0017F266 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = A36CD4332E1B7AEB0017F266 /* PythonKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +56,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A311AB932E168BF900C8B181 /* StringMetric in Frameworks */,
-				A36CD4342E1B7AEB0017F266 /* PythonKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,7 +125,6 @@
 			name = "testOCR-both";
 			packageProductDependencies = (
 				A311AB922E168BF900C8B181 /* StringMetric */,
-				A36CD4332E1B7AEB0017F266 /* PythonKit */,
 			);
 			productName = "testOCR-both";
 			productReference = A311AB1A2E16883E00C8B181 /* testOCR-both.app */;
@@ -212,7 +209,6 @@
 			mainGroup = DFAD6E782382AABB00FE14F7;
 			packageReferences = (
 				A311AB912E168BF100C8B181 /* XCRemoteSwiftPackageReference "StringMetric" */,
-				A36CD4282E1B78D90017F266 /* XCRemoteSwiftPackageReference "PythonKit" */,
 			);
 			preferredProjectObjectVersion = 50;
 			productRefGroup = DFAD6E822382AABB00FE14F7 /* Products */;
@@ -297,6 +293,7 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
@@ -324,8 +321,9 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				OTHER_SWIFT_FLAGS = "\"-DPYTHON_MODULES\"";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-both";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-MS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
@@ -355,6 +353,7 @@
 				AUTOMATION_APPLE_EVENTS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5QXF6Z2NB3;
@@ -381,8 +380,9 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-both";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rosemaryyang.testOCR-MS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				REGISTER_APP_GROUPS = YES;
 				RUNTIME_EXCEPTION_ALLOW_DYLD_ENVIRONMENT_VARIABLES = NO;
 				RUNTIME_EXCEPTION_ALLOW_JIT = NO;
@@ -692,14 +692,6 @@
 				minimumVersion = 0.3.2;
 			};
 		};
-		A36CD4282E1B78D90017F266 /* XCRemoteSwiftPackageReference "PythonKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pvieito/PythonKit";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -707,11 +699,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A311AB912E168BF100C8B181 /* XCRemoteSwiftPackageReference "StringMetric" */;
 			productName = StringMetric;
-		};
-		A36CD4332E1B7AEB0017F266 /* PythonKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A36CD4282E1B78D90017F266 /* XCRemoteSwiftPackageReference "PythonKit" */;
-			productName = PythonKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
