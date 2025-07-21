@@ -25,6 +25,7 @@ struct MainHomeView: View {
                 .tabItem {
                     Label("Query", systemImage: "questionmark.circle")
                 }
+            
         }
     }
 }

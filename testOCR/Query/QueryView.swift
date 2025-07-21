@@ -68,22 +68,15 @@ struct QueryView: View {
             
             // Test button
             Button("Run Quick Tests") {
-//                Task {
+                Task {
 ////                    let quickTest = QuickValidationTest()
 ////                    await quickTest.runQuickValidation()
 ////                    let focusedTest = FocusedHoldingsTest()
 ////                    await focusedTest.runFocusedTests()
 //                    
 //                    let test = FocusedHoldingsTest()
-////                    await test.runFocusedTests()
+//                    await test.runFocusedTests()
 //                    await test.debugAvailableData()
-//                }
-                Task {
-                    print("hi")
-                    let session = QueryLanguageSession()
-                    let response = try await session.send("Show me all my holdings")
-                    print("Updated instructions test:")
-                    print(response)
                 }
             }
             .padding(.bottom)

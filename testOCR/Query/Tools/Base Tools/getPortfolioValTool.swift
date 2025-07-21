@@ -357,32 +357,3 @@ enum PerformanceError: Error, LocalizedError {
         }
     }
 }
-
-// MARK: - Usage Examples
-
-/*
- Usage Examples:
- 
- // Get current performance
- let current = PortfolioPerformanceTool.shared.getCurrentPerformance()
- print(current.message)
- 
- // Get YTD performance
- let ytd = PortfolioPerformanceTool.shared.getYearToDatePerformance()
- print("YTD Return: \(ytd.data["ytd_gross_percent"] ?? 0)%")
- 
- // Get performance trend
- let trend = PortfolioPerformanceTool.shared.getPerformanceTrend()
- print("Trend: \(trend.data["trend_direction"] ?? "unknown")")
- 
- // Custom queries
- let volatility = PortfolioPerformanceTool.shared.getPerformanceData(query: "volatility analysis")
- let bestWorst = PortfolioPerformanceTool.shared.getPerformanceData(query: "best and worst performance")
- let cashFlow = PortfolioPerformanceTool.shared.getPerformanceData(query: "contribution analysis")
- let growth = PortfolioPerformanceTool.shared.getPerformanceData(query: "growth over time")
- 
- // Access raw data
- if let marketChanges = trend.data["market_changes"] as? [Double] {
-     print("Monthly changes: \(marketChanges)")
- }
- */

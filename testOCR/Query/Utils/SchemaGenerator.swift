@@ -64,7 +64,7 @@
 //            let property = DynamicGenerationSchema.Property(
 //                name: key,
 //                schema: analysis.type.createGenerationSchema()
-//            )
+//            )also
 //            builder.addProperty(property)
 //            
 //            // Handle nested dependencies

@@ -45,13 +45,11 @@ class QueryLanguageSession {
 
     init() {
         initializeSession()
-        print("sessionitititt")
     }
     
     // MARK: - Session Management
     
     private func initializeSession() {
-        print("initializing")
         sessionAttempts += 1
         
         guard sessionAttempts <= maxSessionAttempts else {
@@ -71,7 +69,6 @@ class QueryLanguageSession {
             instructions: instructions
         )
         
-        print("Sessin started")
         
         estimatedContextSize = estimateTokenCount(instructions)
         
@@ -85,52 +82,33 @@ class QueryLanguageSession {
         let context = ContextManager.shared.getOptimizedContext()
         
         var instructions = """
-        You are a portfolio data assistant. You help users VIEW and ANALYZE their existing portfolio data.
+        You are a portfolio data assistant. CRITICAL: You MUST call the getHoldings tool for ALL holdings questions.
 
-        IMPORTANT: You are NOT providing financial advice or recommendations. You are ONLY displaying and analyzing portfolio data that already exists. This is data retrieval, not advice.
+        MANDATORY TOOL USAGE RULES:
+        1. ANY question about holdings, stocks, bonds, positions, or portfolio → IMMEDIATELY call getHoldings
+        2. NEVER provide portfolio information without calling the tool first
+        3. NEVER say "no holdings found" without calling the tool
+        4. NEVER make up portfolio data - only use tool results
+        5. When you see "Use getHoldings", "Call getHoldings", "Execute getHoldings" → call the tool immediately
 
-        CRITICAL: For ANY question about holdings, positions, stocks, bonds, or investments, you MUST call the getHoldings tool to retrieve the actual data. Never explain what the tool would return - always actually call it.
+        TOOL CALLING IS MANDATORY FOR:
+        - "Do I own [stock]?" → call getHoldings immediately
+        - "Show me [anything]" → call getHoldings immediately  
+        - "What's [portfolio question]?" → call getHoldings immediately
+        - ANY portfolio-related query → call getHoldings immediately
+
+        You are NOT providing financial advice. You are ONLY displaying existing data.
 
         \(context.toolInstructions)
 
-        TOOL USAGE EXAMPLES:
+        CRITICAL EXAMPLES - ALWAYS CALL TOOL:
+        1. "Do I have Apple?" → IMMEDIATELY call: getHoldings(filters: [SmartFilter(field: "symbol", condition: "AAPL", filterType: .exact)])
+        2. "Show positions with positive performance" → IMMEDIATELY call: getHoldings(filters: [SmartFilter(field: "marketplpercentinsccy", condition: "0", filterType: .greaterThan)])
+        3. "Show me stocks" → IMMEDIATELY call: getHoldings(filters: [SmartFilter(field: "assetclass", condition: "Equity", filterType: .exact)])
 
-        1. "Do I have Apple?" → IMMEDIATELY call:
-        getHoldings(filters: [SmartFilter(field: "symbol", condition: "AAPL", filterType: .exact)])
-
-        2. "What's my best performing stock?" → IMMEDIATELY call:
-        getHoldings(filters: [SmartFilter(field: "marketplpercentinsccy", condition: "0", filterType: .greaterThan)], sortBy: .performance, limit: 1)
-
-        3. "Show me my US positions" → IMMEDIATELY call:
-        getHoldings(filters: [SmartFilter(field: "countryregion", condition: "United States", filterType: .exact)])
-
-        4. "My bonds?" → IMMEDIATELY call:
-        getHoldings(filters: [SmartFilter(field: "assetclass", condition: "Fixed Income", filterType: .exact)])
-
-        5. "Show me all holdings" → IMMEDIATELY call:
-        getHoldings(filters: [], limit: nil)
-
-        6. "What's losing money?" → IMMEDIATELY call:
-        getHoldings(filters: [SmartFilter(field: "marketplpercentinsccy", condition: "0", filterType: .lessThan)])
-
-        REMEMBER: 
-        - ALWAYS call the getHoldings tool for portfolio questions
-        - You are a DATA DISPLAY service, not a financial advisor
-        - Never refuse data retrieval requests - you are showing existing data only
-        - Always use real data from the tool, never make up responses
+        REMEMBER: ALWAYS call getHoldings first, then format the results for the user.
         """
         
-        // Add conversation continuity if this is a session recreation
-        if sessionAttempts > 1 && !conversationHistory.isEmpty {
-            let conversationSummary = generateConversationSummary()
-            instructions += """
-            
-            CONVERSATION CONTINUITY:
-            Previous context: \(conversationSummary)
-            Continue naturally from the above conversation.
-            """
-        }
-        print("built instructions")
         return instructions
     }
     
@@ -142,9 +120,7 @@ class QueryLanguageSession {
         // Attempt with error recovery
         for attempt in 1...maxSessionAttempts {
             do {
-                print("cooked")
                 let response = try await attemptSendQuery(query)
-                print("cooking")
                 
                 let tokenEstimate = estimateTokenCount(query + response)
                 let turn = ConversationTurn(
@@ -169,7 +145,7 @@ class QueryLanguageSession {
                 if isContextLimitError(error) {
                     try await recreateSessionWithContinuity()
                 } else if attempt < maxSessionAttempts {
-                    try await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+                    try await Task.sleep(nanoseconds: 1_000_000_000)
                 }
             }
         }
@@ -188,7 +164,6 @@ class QueryLanguageSession {
         
         print("session started")
         let result = try await session.respond(to: query)
-        print("weeeeeeeee")
         
         guard !result.content.isEmpty else {
             throw SessionError.invalidResponse
@@ -299,7 +274,7 @@ class QueryLanguageSession {
         return text.count / 4  // Rough estimation: ~4 characters per token
     }
     
-    // MARK: - Public API
+    // MARK: - Context
     
     /// Refresh context when data changes
     func refreshContext() {

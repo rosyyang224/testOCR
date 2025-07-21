@@ -1,3 +1,12 @@
+//
+//  FieldTagsConfig.swift
+//  airbank-ocr-demo
+//
+//  Created by Rosemary Yang on 7/15/25.
+//  Copyright © 2025 Marek Přidal. All rights reserved.
+//
+
+
 import Foundation
 
 /// Configuration file containing semantic tags for portfolio holding fields

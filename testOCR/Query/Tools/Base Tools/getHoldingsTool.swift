@@ -13,50 +13,24 @@ struct getHoldingsTool: Tool {
     let description: String
     
     init(userContext: UserContext = UserContext(), isSessionStart: Bool = false) {
-        print("callingtool")
-        var desc: String
+        let context = ContextManager.shared.getOptimizedContext(forceRefresh: isSessionStart)
         
-        if isSessionStart {
-            let context = ContextManager.shared.getOptimizedContext(forceRefresh: true)
-            
-            desc = """
-            Return holdings filtered intelligently based on user intent.
-            Current date: \(Date().formatted(date: .complete, time: .omitted))
-            
-            \(context.fullSessionContext)
-            
-            NATURAL LANGUAGE PROCESSING:
-            - Company names: Use COMPANIES mapping (Apple→AAPL, Tesla→TSLA)
-            - Performance: "top performers" → marketplpercentinsccy > 0, sort DESC
-            - Asset types: "stocks" → assetclass="Equity", "bonds" → assetclass="Fixed Income"
-            - Geography: "US stocks" → countryregion="United States"
-            - Position size: "large positions" → sort by totalmarketvalue DESC
-            
-            Convert natural language to exact field names using SCHEMA mapping.
-            """
-        } else {
-            let context = ContextManager.shared.getOptimizedContext()
-            desc = """
-            Filter portfolio holdings using learned session context.
-            \(context.minimalContext)
-            """
-        }
+        var desc = """
+        Return portfolio holdings filtered by natural language queries.
+        Current date: \(Date().formatted(date: .complete, time: .omitted))
         
-        // Add userContext information to description
+        \(isSessionStart ? context.fullSessionContext : context.minimalContext)
+        
+        CRITICAL: Always call this tool for ANY portfolio-related query.
+        Use actual tool results, never make up responses.
+        """
+        
+        // Add minimal user context if available
         if !userContext.availableFields.isEmpty {
-            desc += "\n\nAvailable fields: \(userContext.availableFields.joined(separator: ", "))"
-        }
-        
-        if !userContext.recentQueries.isEmpty {
-            desc += "\n\nRecent context: \(userContext.recentQueries.joined(separator: "; "))"
-        }
-        
-        if let preferences = userContext.preferences {
-            desc += "\n\nUser preferences: \(preferences.description)"
+            desc += "\n\nRecent fields used: \(userContext.availableFields.prefix(5).joined(separator: ", "))"
         }
         
         self.description = desc
-        print("hiiiiiiii")
     }
     
     struct UserContext {
@@ -83,121 +57,263 @@ struct getHoldingsTool: Tool {
     
     @Generable
     struct Arguments {
-        /// Natural language intent (e.g., "tech stocks", "dividend paying", "underperforming")
-        var intent: String?
+        /// Natural language query (e.g., "show me Apple's performance", "tech stocks that are losing money")
+        var query: String
         
-        /// Specific filters for smart structured matching
-        var filters: [SmartFilter]
-        
-        /// Sorting preference (optional)
-        var sortBy: SortOption?
-        
-        /// Result limit
+        /// Optional result limit
         var limit: Int?
-        
-        @Generable
-        struct SmartFilter {
-            @Guide(description: "Field name (symbol, assetClass, region, sector, etc.)")
-            let field: String
-            
-            @Guide(description: "Value or condition (e.g., 'AAPL', 'Technology', '>1B', 'contains:dividend')")
-            let condition: String
-            
-            @Guide(description: "Filter type: exact, contains, greaterThan, lessThan, etc.")
-            let filterType: FilterType
-        }
-        
-        @Generable
-        enum FilterType: String {
-            case exact, contains, greaterThan, lessThan, startsWith, endsWith
-        }
-        
-        @Generable
-        enum SortOption: String {
-            case marketCap, performance, alphabetical, sector, region, recent
-        }
     }
     
     func call(arguments: Arguments) async -> ToolOutput {
-        // Parse mock data
-        guard let jsonData = mockData.data(using: .utf8),
-              let parsed = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let holdings = parsed["holdings"] as? [[String: Any]] else {
-            return .init("Could not parse mock data.")
-        }
-        
-        // Apply filters
-        let filtered = holdings.filter { record in
-            for filter in arguments.filters {
-                guard let rawValue = record[filter.field] else { return false }
-                
-                let valueStr = String(describing: rawValue).lowercased()
-                let condition = filter.condition.lowercased()
-                
-                switch filter.filterType {
-                case .exact:
-                    if valueStr != condition { return false }
-                case .contains:
-                    if !valueStr.contains(condition) { return false }
-                case .greaterThan:
-                    if let v = Double(valueStr), let target = Double(condition) {
-                        if v <= target { return false }
-                    } else { return false }
-                case .lessThan:
-                    if let v = Double(valueStr), let target = Double(condition) {
-                        if v >= target { return false }
-                    } else { return false }
-                case .startsWith:
-                    if !valueStr.hasPrefix(condition) { return false }
-                case .endsWith:
-                    if !valueStr.hasSuffix(condition) { return false }
-                }
-            }
-            return true
-        }
-        
-        // Apply sorting if specified
-        var sortedHoldings = filtered
-        if let sortBy = arguments.sortBy {
-            let actualSortField: String
-            switch sortBy {
-            case .marketCap: actualSortField = "totalmarketvalue"
-            case .performance: actualSortField = "marketplpercentinsccy"
-            case .alphabetical: actualSortField = "symbol"
-            case .sector: actualSortField = "assetclass"
-            case .region: actualSortField = "countryregion"
-            case .recent: actualSortField = "symbol"
+        do {
+            let jsonString = mockData
+            let parsed = try JSONAnalysisUtils.parseJSON(jsonString)
+            let holdings = try JSONAnalysisUtils.extractHoldings(from: parsed)
+            
+            print("[GetHoldingsTool] Processing query: '\(arguments.query)' on \(holdings.count) holdings")
+            
+            // Use NLP processor to understand the query and generate filters
+            let queryResult = processNaturalLanguageQuery(
+                arguments.query,
+                holdings: holdings
+            )
+            
+            guard !queryResult.filteredHoldings.isEmpty else {
+                let fieldAnalysis = JSONAnalysisUtils.analyzeFields(in: holdings)
+                let availableFields = fieldAnalysis.keys.sorted().joined(separator: ", ")
+                return .init("No holdings matched your query '\(arguments.query)'. Available data fields: \(availableFields)")
             }
             
-            sortedHoldings = filtered.sorted { record1, record2 in
-                guard let value1 = record1[actualSortField],
-                      let value2 = record2[actualSortField] else { return false }
-                
-                if let num1 = value1 as? Double, let num2 = value2 as? Double {
-                    return num1 > num2 // Descending by default
-                } else {
-                    let str1 = String(describing: value1)
-                    let str2 = String(describing: value2)
-                    return str1 < str2 // Ascending for strings
-                }
+            // Apply limit if specified
+            let limited = arguments.limit.map {
+                Array(queryResult.filteredHoldings.prefix($0))
+            } ?? queryResult.filteredHoldings
+            
+            // Format results
+            let summary = formatResults(
+                limited,
+                query: arguments.query,
+                intent: queryResult.intent,
+                allHoldings: holdings
+            )
+            
+            print("[GetHoldingsTool] Returning \(limited.count) holdings for intent: \(queryResult.intent)")
+            
+            return .init(summary)
+            
+        } catch let error as JSONAnalysisError {
+            return .init("JSON Analysis Error: \(error.localizedDescription)")
+        } catch {
+            return .init("Unexpected error: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Natural Language Processing
+    
+    private struct QueryResult {
+        let filteredHoldings: [[String: Any]]
+        let intent: QueryIntent
+        let matchedCompanies: [String]
+    }
+    
+    private func processNaturalLanguageQuery(_ query: String, holdings: [[String: Any]]) -> QueryResult {
+        let intent = NaturalLanguageProcessor.identifyQueryIntent(from: query)
+        let companyNames = NaturalLanguageProcessor.extractCompanyNamesFromQuery(query)
+        let availableSymbols = holdings.compactMap { $0["symbol"] as? String }
+        
+        // 4. Resolve company names to symbols (this is where you'd call foundation model)
+        var resolvedSymbols: [String] = []
+        for companyName in companyNames {
+            if let symbol = resolveCompanyToSymbol(companyName, availableSymbols: availableSymbols) {
+                resolvedSymbols.append(symbol)
             }
         }
         
-        // Apply limit
-        let limited = arguments.limit.map { Array(sortedHoldings.prefix($0)) } ?? sortedHoldings
+        // 5. Apply semantic filters based on intent and resolved companies
+        let filtered = applySemanticFilters(
+            to: holdings,
+            intent: intent,
+            query: query,
+            targetSymbols: resolvedSymbols
+        )
         
-        guard !limited.isEmpty else {
-            let availableFields = holdings.first?.keys.sorted().joined(separator: ", ") ?? "none"
-            return .init("No holdings matched the given filters. Available fields: \(availableFields)")
+        return QueryResult(
+            filteredHoldings: filtered,
+            intent: intent,
+            matchedCompanies: resolvedSymbols
+        )
+    }
+    
+    private func applySemanticFilters(
+        to holdings: [[String: Any]],
+        intent: QueryIntent,
+        query: String,
+        targetSymbols: [String]
+    ) -> [[String: Any]] {
+        
+        var filtered = holdings
+        let lowercasedQuery = query.lowercased()
+        
+        // Filter by specific companies if mentioned
+        if !targetSymbols.isEmpty {
+            filtered = filtered.filter { holding in
+                guard let symbol = holding["symbol"] as? String else { return false }
+                return targetSymbols.contains(symbol)
+            }
         }
         
-        // Format results
-        let summary = limited.map { record in
-            record.map { "\($0.key): \($0.value)" }.joined(separator: ", ")
-        }.joined(separator: "\n\n")
+        // Apply intent-based filters
+        switch intent {
+        case .performance:
+            if lowercasedQuery.contains("positive") || lowercasedQuery.contains("gaining") || lowercasedQuery.contains("winning") {
+                filtered = filtered.filter { holding in
+                    (holding["marketplpercentinsccy"] as? Double ?? 0) > 0
+                }
+            } else if lowercasedQuery.contains("negative") || lowercasedQuery.contains("losing") || lowercasedQuery.contains("underperforming") {
+                filtered = filtered.filter { holding in
+                    (holding["marketplpercentinsccy"] as? Double ?? 0) < 0
+                }
+            }
+            // Sort by performance
+            filtered = filtered.sorted { holding1, holding2 in
+                let perf1 = holding1["marketplpercentinsccy"] as? Double ?? 0
+                let perf2 = holding2["marketplpercentinsccy"] as? Double ?? 0
+                return perf1 > perf2
+            }
+            
+        case .assetAllocation:
+            if lowercasedQuery.contains("stocks") || lowercasedQuery.contains("equity") {
+                filtered = filtered.filter { holding in
+                    (holding["assetclass"] as? String)?.lowercased().contains("equity") == true
+                }
+            } else if lowercasedQuery.contains("bonds") || lowercasedQuery.contains("fixed") {
+                filtered = filtered.filter { holding in
+                    let assetClass = (holding["assetclass"] as? String)?.lowercased() ?? ""
+                    return assetClass.contains("fixed") || assetClass.contains("bond")
+                }
+            }
+            
+        case .geographicAnalysis:
+            if lowercasedQuery.contains("us") || lowercasedQuery.contains("american") {
+                filtered = filtered.filter { holding in
+                    (holding["countryregion"] as? String)?.lowercased().contains("united states") == true
+                }
+            } else if lowercasedQuery.contains("international") || lowercasedQuery.contains("foreign") {
+                filtered = filtered.filter { holding in
+                    (holding["countryregion"] as? String)?.lowercased().contains("united states") == false
+                }
+            }
+            
+        case .summaryAnalysis:
+            if lowercasedQuery.contains("largest") || lowercasedQuery.contains("biggest") {
+                filtered = filtered.sorted { holding1, holding2 in
+                    let value1 = holding1["totalmarketvalue"] as? Double ?? 0
+                    let value2 = holding2["totalmarketvalue"] as? Double ?? 0
+                    return value1 > value2
+                }
+            }
+            
+        default:
+            // For other intents, rely on company filtering and basic relevance
+            break
+        }
         
-        print("[getHoldingsTool] Returning \(limited.count) holdings")
+        return filtered
+    }
+    
+    /// Resolves company names to symbols - in production, this would call a foundation model
+    private func resolveCompanyToSymbol(_ companyName: String, availableSymbols: [String]) -> String? {
+        // This is where you'd call your foundation model:
+        // let prompt = "Convert '\(companyName)' to stock symbol. Available: \(availableSymbols.joined(separator: ", "))"
+        // return await foundationModel.query(prompt)
         
-        return .init(summary)
+        // Basic fallback mapping for demo
+        let lowercased = companyName.lowercased()
+        let mapping: [String: String] = [
+            "apple": "AAPL",
+            "tesla": "TSLA",
+            "google": "GOOGL",
+            "alphabet": "GOOGL",
+            "alibaba": "9988.HK",
+            "microsoft": "MSFT",
+            "amazon": "AMZN"
+        ]
+        
+        let symbol = mapping[lowercased]
+        return availableSymbols.contains(symbol ?? "") ? symbol : nil
+    }
+    
+    // MARK: - Result Formatting
+    
+    private func formatResults(
+        _ holdings: [[String: Any]],
+        query: String,
+        intent: QueryIntent,
+        allHoldings: [[String: Any]]
+    ) -> String {
+        
+        // Build company mappings for display
+        let companyMappings = NaturalLanguageProcessor.extractCompanyMappings(from: allHoldings)
+        let mappingDict = Dictionary(uniqueKeysWithValues: companyMappings.compactMap { mapping in
+            let parts = mapping.components(separatedBy: "=")
+            return parts.count == 2 ? (parts[1], parts[0]) : nil
+        })
+        
+        var summary = "Results for: \"\(query)\"\n"
+        summary += "Found \(holdings.count) matching holdings\n\n"
+        
+        for (index, holding) in holdings.enumerated() {
+            if index > 0 { summary += "\n" }
+            
+            var lines: [String] = []
+            
+            // Symbol and company name
+            if let symbol = holding["symbol"] {
+                let symbolStr = String(describing: symbol)
+                let company = mappingDict[symbolStr] ?? symbolStr
+                lines.append("🏢 \(company) (\(symbolStr))")
+            }
+            
+            // Key metrics based on intent
+            switch intent {
+            case .performance:
+                if let performance = holding["marketplpercentinsccy"] as? Double {
+                    let perfStr = String(format: "%.2f%%", performance)
+                    let icon = performance >= 0 ? "📈" : "📉"
+                    lines.append("\(icon) Performance: \(perfStr)")
+                }
+                if let marketValue = holding["totalmarketvalue"] {
+                    lines.append("💰 Value: $\(marketValue)")
+                }
+                
+            case .assetAllocation, .geographicAnalysis:
+                if let assetClass = holding["assetclass"] {
+                    lines.append("📊 Asset: \(assetClass)")
+                }
+                if let region = holding["countryregion"] {
+                    lines.append("🌍 Region: \(region)")
+                }
+                if let marketValue = holding["totalmarketvalue"] {
+                    lines.append("💰 Value: $\(marketValue)")
+                }
+                
+            default:
+                // General format
+                if let assetClass = holding["assetclass"] {
+                    lines.append("📊 \(assetClass)")
+                }
+                if let marketValue = holding["totalmarketvalue"] {
+                    lines.append("💰 $\(marketValue)")
+                }
+                if let performance = holding["marketplpercentinsccy"] as? Double {
+                    let perfStr = String(format: "%.2f%%", performance)
+                    lines.append("📈 \(perfStr)")
+                }
+            }
+            
+            summary += lines.joined(separator: " | ")
+        }
+        
+        return summary
     }
 }

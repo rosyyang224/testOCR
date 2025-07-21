@@ -1,373 +1,258 @@
-//
-//  EmbeddingMatcher.swift
-//  airbank-ocr-demo
-//
-//  Created by Rosemary Yang on 7/15/25.
-//  Copyright © 2025 Marek Přidal. All rights reserved.
-//
-
-
 import Foundation
+import NaturalLanguage
 
+/// Focused semantic field matcher using Apple's NLEmbedding
 class EmbeddingMatcher {
     
-    // MARK: - Field Tag Configuration
+    // MARK: - Core Embedding Models
     
-    private static let fieldTags: [String: [String]] = [
-        "symbol": ["ticker", "stock", "symbol", "code", "instrument", "security"],
-        "assetclass": ["asset", "type", "category", "class", "equity", "bond", "stock", "fixed income", "etf", "fund"],
-        "countryregion": ["country", "region", "geography", "location", "domestic", "international", "us", "america", "china", "europe"],
-        "marketplpercentinsccy": ["performance", "return", "gain", "loss", "profit", "pnl", "change", "growth", "decline"],
-        "totalmarketvalue": ["value", "worth", "size", "amount", "market cap", "position", "holding", "investment"],
-        "sector": ["industry", "sector", "business", "technology", "healthcare", "finance", "energy"],
-        "weight": ["allocation", "percentage", "weight", "proportion", "share", "portion"],
-        "dividend": ["income", "yield", "payout", "distribution", "dividend"],
-        "risk": ["volatility", "risk", "beta", "variance", "deviation", "stability"],
-        "maturity": ["duration", "term", "maturity", "expiry", "time", "period"]
-    ]
+    private static var sentenceEmbedding: NLEmbedding? = {
+        return NLEmbedding.sentenceEmbedding(for: .english)
+    }()
     
-    private static let operatorTags: [String: [String]] = [
-        "greater": ["above", "over", "more than", "higher", "greater", "exceeds", "top", "largest", "biggest"],
-        "less": ["below", "under", "less than", "lower", "smaller", "bottom", "smallest", "minimum"],
-        "equal": ["equals", "is", "exactly", "matching", "same as", "specific"],
-        "contains": ["includes", "has", "contains", "with", "featuring", "type of"],
-        "positive": ["positive", "gaining", "up", "winning", "profitable", "green", "increasing"],
-        "negative": ["negative", "losing", "down", "declining", "unprofitable", "red", "decreasing"]
-    ]
+    private static var wordEmbedding: NLEmbedding? = {
+        return NLEmbedding.wordEmbedding(for: .english)
+    }()
     
-    private static let valueTypeTags: [String: [String]] = [
-        "equity": ["stock", "equity", "share", "common", "ordinary"],
-        "bond": ["bond", "fixed income", "debt", "treasury", "corporate bond"],
-        "etf": ["etf", "fund", "index", "tracker", "exchange traded"],
-        "us": ["us", "usa", "america", "american", "united states", "domestic"],
-        "international": ["international", "foreign", "overseas", "global", "non-us", "emerging"],
-        "tech": ["technology", "tech", "software", "internet", "digital", "innovation"],
-        "finance": ["financial", "bank", "insurance", "payment", "fintech"]
-    ]
-    
-    // MARK: - Embedding-Based Matching
+    // MARK: - Semantic Field Matching
     
     struct FieldMatch {
         let fieldName: String
-        let operator: String
-        let value: String?
         let confidence: Double
+        let semanticDistance: Double
     }
     
-    struct QueryAnalysis {
-        let fieldMatches: [FieldMatch]
-        let sortPreference: String?
-        let limitHint: Int?
+    struct QueryFieldMapping {
+        let matches: [FieldMatch]
+        let bestMatch: FieldMatch?
+        let queryTokens: [String]
     }
     
-    /// Analyzes a natural language query and returns semantic field matches
-    static func analyzeQuery(_ query: String, availableFields: [String]) -> QueryAnalysis {
-        let lowercasedQuery = query.lowercased()
-        let queryTokens = tokenizeQuery(lowercasedQuery)
-        
+    /// Main function: semantically matches user query tokens to portfolio field names
+    static func matchQueryToFields(_ query: String, availableFields: [String]) -> QueryFieldMapping {
+        let queryTokens = tokenizeQuery(query)
         var fieldMatches: [FieldMatch] = []
-        var sortPreference: String? = nil
-        var limitHint: Int? = nil
         
-        // Extract sorting preferences
-        if queryTokens.contains(where: { ["largest", "biggest", "top", "highest"].contains($0) }) {
-            sortPreference = "descending"
-        } else if queryTokens.contains(where: { ["smallest", "lowest", "bottom"].contains($0) }) {
-            sortPreference = "ascending"
-        }
-        
-        // Extract limit hints
-        for token in queryTokens {
-            if let number = Int(token), number <= 50 {
-                limitHint = number
-                break
-            }
-        }
-        if queryTokens.contains("top") || queryTokens.contains("best") {
-            limitHint = limitHint ?? 10
-        }
-        
-        // Find field matches using embedding similarity
         for field in availableFields {
-            if let match = findBestFieldMatch(field: field, queryTokens: queryTokens, originalQuery: lowercasedQuery) {
+            if let match = calculateFieldMatch(queryTokens: queryTokens, fieldName: field) {
                 fieldMatches.append(match)
             }
         }
         
-        return QueryAnalysis(
-            fieldMatches: fieldMatches,
-            sortPreference: sortPreference,
-            limitHint: limitHint
+        // Sort by confidence (higher is better)
+        fieldMatches.sort { $0.confidence > $1.confidence }
+        
+        return QueryFieldMapping(
+            matches: fieldMatches,
+            bestMatch: fieldMatches.first,
+            queryTokens: queryTokens
         )
     }
     
-    private static func findBestFieldMatch(field: String, queryTokens: [String], originalQuery: String) -> FieldMatch? {
-        guard let fieldTagList = fieldTags[field] else { return nil }
+    /// Calculates semantic similarity between query tokens and a specific field's tags
+    private static func calculateFieldMatch(queryTokens: [String], fieldName: String) -> FieldMatch? {
+        guard let fieldTags = FieldTagsConfig.fieldSemanticTags[fieldName] else {
+            return nil
+        }
         
-        // Calculate semantic similarity between query tokens and field tags
-        var bestFieldScore = 0.0
-        for token in queryTokens {
-            for tag in fieldTagList {
-                let similarity = calculateSemanticSimilarity(token, tag)
-                bestFieldScore = max(bestFieldScore, similarity)
+        var maxSimilarity = 0.0
+        var totalSimilarity = 0.0
+        var matchCount = 0
+        
+        // Compare each query token against each field tag using embeddings
+        for queryToken in queryTokens {
+            for fieldTag in fieldTags {
+                let similarity = calculateSemanticSimilarity(queryToken, fieldTag)
+                
+                if similarity > 0.3 { // Only count meaningful similarities
+                    totalSimilarity += similarity
+                    matchCount += 1
+                    maxSimilarity = max(maxSimilarity, similarity)
+                }
             }
         }
         
-        // Require minimum confidence threshold
-        guard bestFieldScore > 0.3 else { return nil }
+        // Require at least one meaningful match
+        guard matchCount > 0 else { return nil }
         
-        // Determine operator
-        let operator = determineOperator(from: queryTokens, for: field)
+        // Calculate confidence: blend of max similarity and average similarity
+        let avgSimilarity = totalSimilarity / Double(matchCount)
+        let confidence = (maxSimilarity * 0.7) + (avgSimilarity * 0.3)
         
-        // Extract value if applicable
-        let value = extractValue(from: originalQuery, for: field, operator: operator)
+        // Only return matches above threshold
+        guard confidence > 0.4 else { return nil }
         
         return FieldMatch(
-            fieldName: field,
-            operator: operator,
-            value: value,
-            confidence: bestFieldScore
+            fieldName: fieldName,
+            confidence: confidence,
+            semanticDistance: 1.0 - maxSimilarity
         )
     }
     
-    private static func determineOperator(from tokens: [String], for field: String) -> String {
-        // Check for explicit operators
-        for (op, tags) in operatorTags {
-            for token in tokens {
-                for tag in tags {
-                    if calculateSemanticSimilarity(token, tag) > 0.7 {
-                        return op
-                    }
-                }
+    /// Uses Apple's NLEmbedding to calculate semantic similarity between two strings
+    private static func calculateSemanticSimilarity(_ text1: String, _ text2: String) -> Double {
+        // Try sentence embedding first for better context
+        if let sentenceEmb = sentenceEmbedding {
+            if let embedding1 = sentenceEmb.vector(for: text1),
+               let embedding2 = sentenceEmb.vector(for: text2) {
+                return cosineSimilarity(embedding1, embedding2)
             }
         }
         
-        // Field-specific defaults
-        switch field {
-        case "marketplpercentinsccy":
-            if tokens.contains(where: { ["positive", "gaining", "up", "winning"].contains($0) }) {
-                return "positive"
-            } else if tokens.contains(where: { ["negative", "losing", "down", "declining"].contains($0) }) {
-                return "negative"
+        // Fallback to word embedding
+        if let wordEmb = wordEmbedding {
+            if let embedding1 = wordEmb.vector(for: text1),
+               let embedding2 = wordEmb.vector(for: text2) {
+                return cosineSimilarity(embedding1, embedding2)
             }
-            return "greater"
-        case "totalmarketvalue":
-            return "greater"
-        default:
-            return "contains"
         }
+        
+        // Final fallback to string similarity
+        return fallbackStringSimilarity(text1, text2)
     }
     
-    private static func extractValue(from query: String, for field: String, operator: String) -> String? {
-        let lowercased = query.lowercased()
+    /// Calculates cosine similarity between two embedding vectors
+    private static func cosineSimilarity(_ vector1: [Double], _ vector2: [Double]) -> Double {
+        guard vector1.count == vector2.count else { return 0.0 }
         
-        // Extract specific values based on field type
-        switch field {
-        case "assetclass":
-            for (valueType, tags) in valueTypeTags {
-                for tag in tags {
-                    if lowercased.contains(tag) {
-                        return valueType
-                    }
-                }
-            }
-        case "countryregion":
-            if lowercased.contains("us") || lowercased.contains("america") {
-                return "us"
-            } else if lowercased.contains("international") || lowercased.contains("foreign") {
-                return "international"
-            }
-        case "symbol":
-            // Extract potential ticker symbols (uppercase letters)
-            let words = query.components(separatedBy: .whitespacesAndNewlines)
-            for word in words {
-                if word.allSatisfy({ $0.isUppercase || $0.isNumber || $0 == "." }) && word.count >= 1 && word.count <= 10 {
-                    return word
-                }
-            }
-        default:
-            break
-        }
+        let dotProduct = zip(vector1, vector2).map(*).reduce(0, +)
+        let magnitude1 = sqrt(vector1.map { $0 * $0 }.reduce(0, +))
+        let magnitude2 = sqrt(vector2.map { $0 * $0 }.reduce(0, +))
         
-        return nil
+        guard magnitude1 > 0 && magnitude2 > 0 else { return 0.0 }
+        
+        return dotProduct / (magnitude1 * magnitude2)
     }
     
-    // MARK: - Simplified Semantic Similarity
-    
-    private static func calculateSemanticSimilarity(_ word1: String, _ word2: String) -> Double {
+    /// Fallback string similarity when embeddings are not available
+    private static func fallbackStringSimilarity(_ text1: String, _ text2: String) -> Double {
+        let str1 = text1.lowercased()
+        let str2 = text2.lowercased()
+        
         // Exact match
-        if word1 == word2 {
-            return 1.0
-        }
+        if str1 == str2 { return 1.0 }
         
         // Substring match
-        if word1.contains(word2) || word2.contains(word1) {
-            return 0.8
-        }
+        if str1.contains(str2) || str2.contains(str1) { return 0.8 }
         
-        // Common stemming/lemmatization patterns
-        let stems1 = generateStems(word1)
-        let stems2 = generateStems(word2)
+        // Stemming match
+        let stems1 = generateStems(str1)
+        let stems2 = generateStems(str2)
         
         for stem1 in stems1 {
             for stem2 in stems2 {
-                if stem1 == stem2 {
-                    return 0.6
-                }
+                if stem1 == stem2 { return 0.6 }
             }
         }
         
-        // Character-level similarity (Jaccard)
-        let set1 = Set(word1)
-        let set2 = Set(word2)
+        // Character overlap (Jaccard)
+        let set1 = Set(str1)
+        let set2 = Set(str2)
         let intersection = set1.intersection(set2)
         let union = set1.union(set2)
         
-        let jaccardSimilarity = Double(intersection.count) / Double(union.count)
+        let jaccard = Double(intersection.count) / Double(union.count)
+        return jaccard > 0.4 ? jaccard * 0.5 : 0.0
+    }
+    
+    // MARK: - Additional Semantic Matching Helpers
+    
+    /// Matches query intent to semantic categories
+    static func matchQueryIntent(_ query: String) -> [(intent: String, confidence: Double)] {
+        let queryTokens = tokenizeQuery(query)
+        var intentMatches: [(String, Double)] = []
         
-        return jaccardSimilarity > 0.4 ? jaccardSimilarity * 0.5 : 0.0
+        for (intent, tags) in FieldTagsConfig.queryIntentTags {
+            var maxSimilarity = 0.0
+            
+            for token in queryTokens {
+                for tag in tags {
+                    let similarity = calculateSemanticSimilarity(token, tag)
+                    maxSimilarity = max(maxSimilarity, similarity)
+                }
+            }
+            
+            if maxSimilarity > 0.3 {
+                intentMatches.append((intent, maxSimilarity))
+            }
+        }
+        
+        return intentMatches.sorted { $0.1 > $1.1 }
+    }
+    
+    /// Matches query values to semantic value types
+    static func matchQueryValues(_ query: String) -> [(valueType: String, confidence: Double)] {
+        let queryTokens = tokenizeQuery(query)
+        var valueMatches: [(String, Double)] = []
+        
+        for (valueType, tags) in FieldTagsConfig.valueTypeTags {
+            var maxSimilarity = 0.0
+            
+            for token in queryTokens {
+                for tag in tags {
+                    let similarity = calculateSemanticSimilarity(token, tag)
+                    maxSimilarity = max(maxSimilarity, similarity)
+                }
+            }
+            
+            if maxSimilarity > 0.4 {
+                valueMatches.append((valueType, maxSimilarity))
+            }
+        }
+        
+        return valueMatches.sorted { $0.1 > $1.1 }
+    }
+    
+    /// Matches query operators semantically
+    static func matchQueryOperators(_ query: String) -> [(operator: String, confidence: Double)] {
+        let queryTokens = tokenizeQuery(query)
+        var operatorMatches: [(String, Double)] = []
+        
+        for (operatorType, tags) in FieldTagsConfig.operatorTags {
+            var maxSimilarity = 0.0
+            
+            for token in queryTokens {
+                for tag in tags {
+                    let similarity = calculateSemanticSimilarity(token, tag)
+                    maxSimilarity = max(maxSimilarity, similarity)
+                }
+            }
+            
+            if maxSimilarity > 0.5 {
+                operatorMatches.append((operatorType, maxSimilarity))
+            }
+        }
+        
+        return operatorMatches.sorted { $0.1 > $1.1 }
+    }
+    
+    // MARK: - Utility Functions
+    
+    private static func tokenizeQuery(_ query: String) -> [String] {
+        var characterSet = CharacterSet.whitespacesAndNewlines
+        characterSet.formUnion(.punctuationCharacters)
+        
+        return query.components(separatedBy: characterSet)
+            .filter { !$0.isEmpty && $0.count > 1 }
+            .map { $0.lowercased() }
     }
     
     private static func generateStems(_ word: String) -> [String] {
         var stems = [word]
         
-        // Simple stemming rules
-        if word.hasSuffix("ing") {
+        if word.hasSuffix("ing") && word.count > 4 {
             stems.append(String(word.dropLast(3)))
         }
-        if word.hasSuffix("ed") {
+        if word.hasSuffix("ed") && word.count > 3 {
             stems.append(String(word.dropLast(2)))
         }
         if word.hasSuffix("s") && word.count > 3 {
             stems.append(String(word.dropLast(1)))
         }
-        if word.hasSuffix("ly") {
+        if word.hasSuffix("ly") && word.count > 3 {
             stems.append(String(word.dropLast(2)))
         }
         
         return stems
-    }
-    
-    private static func tokenizeQuery(_ query: String) -> [String] {
-        return query.components(separatedBy: .whitespacesAndPunctuationCharacters)
-            .filter { !$0.isEmpty && $0.count > 1 }
-            .map { $0.lowercased() }
-    }
-    
-    // MARK: - Filter Application
-    
-    /// Applies embedding-matched filters to holdings data
-    static func applySemanticFilters(
-        to holdings: [[String: Any]], 
-        using analysis: QueryAnalysis
-    ) -> [[String: Any]] {
-        
-        var filtered = holdings
-        
-        // Apply each field match
-        for match in analysis.fieldMatches.sorted(by: { $0.confidence > $1.confidence }) {
-            filtered = applyFieldFilter(
-                to: filtered, 
-                field: match.fieldName, 
-                operator: match.operator, 
-                value: match.value
-            )
-        }
-        
-        // Apply sorting if specified
-        if let sortPref = analysis.sortPreference {
-            filtered = applySorting(to: filtered, preference: sortPref, fieldMatches: analysis.fieldMatches)
-        }
-        
-        // Apply limit
-        if let limit = analysis.limitHint {
-            filtered = Array(filtered.prefix(limit))
-        }
-        
-        return filtered
-    }
-    
-    private static func applyFieldFilter(
-        to holdings: [[String: Any]], 
-        field: String, 
-        operator: String, 
-        value: String?
-    ) -> [[String: Any]] {
-        
-        return holdings.filter { holding in
-            guard let fieldValue = holding[field] else { return false }
-            
-            switch operator {
-            case "positive":
-                return (fieldValue as? Double ?? 0) > 0
-            case "negative":
-                return (fieldValue as? Double ?? 0) < 0
-            case "greater":
-                if let threshold = Double(value ?? "0") {
-                    return (fieldValue as? Double ?? 0) > threshold
-                }
-                return true
-            case "less":
-                if let threshold = Double(value ?? "0") {
-                    return (fieldValue as? Double ?? 0) < threshold
-                }
-                return true
-            case "contains":
-                let fieldStr = String(describing: fieldValue).lowercased()
-                if let targetValue = value {
-                    return matchFieldValue(fieldStr, targetValue: targetValue)
-                }
-                return true
-            case "equal":
-                let fieldStr = String(describing: fieldValue).lowercased()
-                if let targetValue = value {
-                    return fieldStr == targetValue.lowercased()
-                }
-                return true
-            default:
-                return true
-            }
-        }
-    }
-    
-    private static func matchFieldValue(_ fieldValue: String, targetValue: String) -> String {
-        // Enhanced value matching using semantic tags
-        let target = targetValue.lowercased()
-        
-        switch target {
-        case "equity", "stock":
-            return fieldValue.contains("equity") || fieldValue.contains("stock")
-        case "bond":
-            return fieldValue.contains("bond") || fieldValue.contains("fixed")
-        case "us":
-            return fieldValue.contains("united states") || fieldValue.contains("usa")
-        case "international":
-            return !fieldValue.contains("united states") && !fieldValue.contains("usa")
-        default:
-            return fieldValue.contains(target)
-        }
-    }
-    
-    private static func applySorting(
-        to holdings: [[String: Any]], 
-        preference: String, 
-        fieldMatches: [FieldMatch]
-    ) -> [[String: Any]] {
-        
-        // Determine primary sort field from matches
-        let primaryField = fieldMatches.max(by: { $0.confidence < $1.confidence })?.fieldName ?? "totalmarketvalue"
-        
-        return holdings.sorted { holding1, holding2 in
-            guard let value1 = holding1[primaryField],
-                  let value2 = holding2[primaryField] else { return false }
-            
-            if let num1 = value1 as? Double, let num2 = value2 as? Double {
-                return preference == "descending" ? num1 > num2 : num1 < num2
-            } else {
-                let str1 = String(describing: value1)
-                let str2 = String(describing: value2)
-                return preference == "descending" ? str1 > str2 : str1 < str2
-            }
-        }
     }
 }

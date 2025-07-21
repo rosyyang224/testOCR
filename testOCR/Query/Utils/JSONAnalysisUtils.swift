@@ -94,7 +94,7 @@ enum JSONAnalysisUtils {
         
         for (key, value) in firstHolding {
             let type = inferType(of: value)
-            let nlHint = generateNLHint(for: key)
+            let nlHint = NaturalLanguageProcessor.generateFieldHint(for: key)
             
             analysis[key] = FieldAnalysis(
                 type: type,
@@ -106,42 +106,10 @@ enum JSONAnalysisUtils {
         return analysis
     }
     
-    static func generateNLHint(for fieldName: String) -> String {
-        let field = fieldName.lowercased()
-        
-        if field.contains("symbol") {
-            return "tickers"
-        } else if field.contains("market") && field.contains("value") {
-            return "position_size"
-        } else if field.contains("performance") || field.contains("pl") {
-            return "performance"
-        } else if field.contains("country") || field.contains("region") {
-            return "geography"
-        } else if field.contains("asset") && field.contains("class") {
-            return "asset_type"
-        } else {
-            return "general"
-        }
-    }
-    
-    // MARK: - Company Mapping
-    
-    static func getCompanyName(for symbol: String) -> String {
-        switch symbol {
-        case "AAPL": return "Apple"
-        case "TSLA": return "Tesla"
-        case "9988.HK": return "Alibaba"
-        case let s where s.contains("US912"): return "TreasuryBond"
-        default: return symbol
-        }
-    }
+    // MARK: - Company Mapping (Delegated to NLP)
     
     static func extractCompanyMappings(from holdings: [[String: Any]]) -> [String] {
-        return holdings.compactMap { holding in
-            guard let symbol = holding["symbol"] as? String else { return nil }
-            let companyName = getCompanyName(for: symbol)
-            return companyName != symbol ? "\(companyName)=\(symbol)" : nil
-        }
+        return NaturalLanguageProcessor.extractCompanyMappings(from: holdings)
     }
 }
 
