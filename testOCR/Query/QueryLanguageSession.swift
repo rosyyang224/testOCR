@@ -44,12 +44,15 @@ class QueryLanguageSession {
     }
 
     init() {
+        print("init started")
         initializeSession()
+        print("init completed")
     }
     
     // MARK: - Session Management
     
     private func initializeSession() {
+        print("initializing session, attempt #\(sessionAttempts + 1)")
         sessionAttempts += 1
         
         guard sessionAttempts <= maxSessionAttempts else {
@@ -61,57 +64,50 @@ class QueryLanguageSession {
         let tools: [any Tool] = [
             getHoldingsTool(isSessionStart: true)
         ]
+        print("getHoldingsTool created")
         
-        let instructions = buildSessionInstructions()
+        let instructions = instructions
+        print(instructions)
+        print("Instructions built")
         
+        print("Creating LanguageModelSession with tools: \(tools.map { $0.description })")
         session = LanguageModelSession(
             tools: tools,
             instructions: instructions
         )
+        print("session created")
         
         
-        estimatedContextSize = estimateTokenCount(instructions)
+        estimatedContextSize = estimateTokenCount(String(describing: instructions))
         
         if sessionAttempts > 1 {
             print("Session recreated with conversation continuity")
         }
     }
     
-    private func buildSessionInstructions() -> String {
-        // Get context using our clean architecture
-        let context = ContextManager.shared.getOptimizedContext()
-        
-        var instructions = """
-        You are a portfolio data assistant. CRITICAL: You MUST call the getHoldings tool for ALL holdings questions.
-
-        MANDATORY TOOL USAGE RULES:
-        1. ANY question about holdings, stocks, bonds, positions, or portfolio → IMMEDIATELY call getHoldings
-        2. NEVER provide portfolio information without calling the tool first
-        3. NEVER say "no holdings found" without calling the tool
-        4. NEVER make up portfolio data - only use tool results
-        5. When you see "Use getHoldings", "Call getHoldings", "Execute getHoldings" → call the tool immediately
-
-        TOOL CALLING IS MANDATORY FOR:
-        - "Do I own [stock]?" → call getHoldings immediately
-        - "Show me [anything]" → call getHoldings immediately  
-        - "What's [portfolio question]?" → call getHoldings immediately
-        - ANY portfolio-related query → call getHoldings immediately
-
-        You are NOT providing financial advice. You are ONLY displaying existing data.
-
-        \(context.toolInstructions)
-
-        CRITICAL EXAMPLES - ALWAYS CALL TOOL:
-        1. "Do I have Apple?" → IMMEDIATELY call: getHoldings(filters: [SmartFilter(field: "symbol", condition: "AAPL", filterType: .exact)])
-        2. "Show positions with positive performance" → IMMEDIATELY call: getHoldings(filters: [SmartFilter(field: "marketplpercentinsccy", condition: "0", filterType: .greaterThan)])
-        3. "Show me stocks" → IMMEDIATELY call: getHoldings(filters: [SmartFilter(field: "assetclass", condition: "Equity", filterType: .exact)])
-
-        REMEMBER: ALWAYS call getHoldings first, then format the results for the user.
-        """
-        
-        return instructions
-    }
-    
+//    private func buildSessionInstructions() -> Instructions {
+//        // Get context using our clean architecture
+//        let context = ContextManager.shared.getOptimizedContext()
+//        
+//        let instructions = Instructions {
+//            "Your job is a portfolio assistant, returning information in a chat-friendly way that explains reasoning."
+//            
+//            
+//            "Always use the get_holdings tool for questions about holdings."
+//            
+//            """
+//            For holdings queries, use `get_holdings` which returns JSON containing:
+//                - 'holdings': array of matching holdings with complete data \
+//                  (symbol, marketvalueinbccy, marketplinsccy, assetclass, countryregion, accounttype, etc.)
+//                - 'count': number of filtered results
+//                - 'total_holdings': total portfolio holdings count
+//            """
+//                        
+//        }
+//        print(instructions)
+//        return instructions
+//    }
+//    
     // MARK: - Query Processing
     
     func send(_ query: String) async throws -> String {
@@ -163,7 +159,10 @@ class QueryLanguageSession {
         }
         
         print("session started")
+        print(query)
         let result = try await session.respond(to: query)
+        print("Got response from session")
+
         
         guard !result.content.isEmpty else {
             throw SessionError.invalidResponse

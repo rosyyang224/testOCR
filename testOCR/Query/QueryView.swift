@@ -11,6 +11,7 @@ struct QueryView: View {
     @State private var messages: [ChatMessage] = []
     @State private var model = QueryLanguageSession()
 
+
     var body: some View {
         VStack {
             Text("Financial Assistant")
@@ -48,6 +49,7 @@ struct QueryView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
 
                 Button("Send") {
+                    print("whats good")
                     let query = userQuery.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !query.isEmpty else { return }
 
