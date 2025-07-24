@@ -136,3 +136,21 @@ enum JSONAnalysisError: Error, LocalizedError {
         }
     }
 }
+
+func format(_ date: Date) -> String {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .short
+    formatter.timeStyle = .short
+    return formatter.string(from: date)
+}
+
+func loadMockDataContainer(from jsonString: String) -> MockDataContainer? {
+    let data = Data(jsonString.utf8)
+    let decoder = JSONDecoder()
+    do {
+        return try decoder.decode(MockDataContainer.self, from: data)
+    } catch {
+        print("Failed to decode mock data: \(error)")
+        return nil
+    }
+}

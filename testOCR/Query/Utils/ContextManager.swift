@@ -1,94 +1,106 @@
+//
+//  ContextManager.swift
+//  PortfolioLLM
+//
+//  Created by OpenAI on 7/23/25.
+//
+
 import Foundation
 
-class ContextManager {
+// MARK: - Lightweight Cached Struct
+struct OptimizedContext {
+    let compactSchema: String
+    let portfolioSummary: String
+    let lastUpdated: Date
+}
+
+// MARK: - Context Manager
+final class ContextManager {
     static let shared = ContextManager()
-    
-    private var cachedContext: OptimizedContext?
-    private var lastAnalysisDate: Date?
-    private let cacheExpirationInterval: TimeInterval = 3600 // 1 hour
-    
+
+    private var cached: OptimizedContext?
+    private let expirationInterval: TimeInterval = 3600  // 1 hour
+
     private init() {}
-    
+
     // MARK: - Public API
-    
+
+    /// Returns cached context, optionally forcing a refresh.
     func getOptimizedContext(forceRefresh: Bool = false) -> OptimizedContext {
-        let needsRefresh = forceRefresh || shouldRefreshCache()
-        
-        if needsRefresh {
-            refreshCache()
+        if forceRefresh || isExpired {
+            refreshContext()
         }
-        
-        return cachedContext ?? OptimizedContext(
-            compactSchema: "ERROR: No context available",
-            portfolioSummary: "ERROR: No portfolio data"
+
+        return cached ?? OptimizedContext(
+            compactSchema: "ERROR: Context unavailable",
+            portfolioSummary: "ERROR: No portfolio data found",
+            lastUpdated: Date.distantPast
         )
     }
-    
+
     func invalidateCache() {
-        cachedContext = nil
-        lastAnalysisDate = nil
+        cached = nil
     }
-    
-    // MARK: - Future Extension Point
-    
-    /// Placeholder for complex query support - will use SchemaGenerator later
-    func getComplexQueryContext() -> String {
-        // TODO: Implement with SchemaGenerator when needed
-        // return SchemaGenerator.generateDynamicMappings(from: mockData)
-        return "Complex queries not yet supported - use simple context for now"
+
+    func getContextSummaryStats() -> String {
+        let context = getOptimizedContext()
+        return """
+        Schema size: \(context.compactSchema.count) chars
+        Summary size: \(context.portfolioSummary.count) chars
+        Last updated: \(format(context.lastUpdated))
+        """
     }
-    
-    // MARK: - Private Implementation
-    
-    private func refreshCache() {
+
+    // MARK: - Private Helpers
+
+    private var isExpired: Bool {
+        guard let last = cached?.lastUpdated else { return true }
+        return Date().timeIntervalSince(last) > expirationInterval
+    }
+
+    private func refreshContext() {
         do {
             let parsed = try JSONAnalysisUtils.parseJSON(mockData)
             let holdings = try JSONAnalysisUtils.extractHoldings(from: parsed)
-            
-            let schemaContext = generateCompactSchema(from: holdings)
-            let portfolioSummary = generatePortfolioSummary(from: holdings)
-            
-            cachedContext = OptimizedContext(
-                compactSchema: schemaContext,
-                portfolioSummary: portfolioSummary
+
+            let schema = summarizeSchema(from: holdings)
+            let summary = summarizePortfolio(from: holdings)
+
+            cached = OptimizedContext(
+                compactSchema: schema,
+                portfolioSummary: summary,
+                lastUpdated: Date()
             )
-            lastAnalysisDate = Date()
-            
         } catch {
-            cachedContext = OptimizedContext(
+            cached = OptimizedContext(
                 compactSchema: "ERROR: \(error.localizedDescription)",
-                portfolioSummary: "ERROR: Failed to generate portfolio summary"
+                portfolioSummary: "ERROR: Summary generation failed",
+                lastUpdated: Date()
             )
         }
     }
-    
-    private func shouldRefreshCache() -> Bool {
-        guard let lastAnalysis = lastAnalysisDate else { return true }
-        return Date().timeIntervalSince(lastAnalysis) > cacheExpirationInterval
-    }
-    
-    private func generateCompactSchema(from holdings: [[String: Any]]) -> String {
-        let fieldAnalysis = JSONAnalysisUtils.analyzeFields(in: holdings)
-        
-        let fieldMappings = fieldAnalysis.map { (key, analysis) in
-            let optional = analysis.isRequired ? "" : "?"
-            return "\(key)(\(analysis.type.compactName)\(optional))→\(analysis.nlHint)"
+
+    private func summarizeSchema(from holdings: [[String: Any]]) -> String {
+        let analysis = JSONAnalysisUtils.analyzeFields(in: holdings)
+        let fieldLines = analysis.map { key, stats in
+            let optional = stats.isRequired ? "" : "?"
+            return "\(key)(\(stats.type.compactName)\(optional))→\(stats.nlHint)"
         }.sorted()
-        
-        return "FIELDS: " + fieldMappings.joined(separator: ", ")
+
+        return "FIELDS: " + fieldLines.joined(separator: ", ")
     }
-    
-    private func generatePortfolioSummary(from holdings: [[String: Any]]) -> String {
+
+    private func summarizePortfolio(from holdings: [[String: Any]]) -> String {
         let symbols = holdings.compactMap { $0["symbol"] as? String }
         let companies = JSONAnalysisUtils.extractCompanyMappings(from: holdings)
         let assetClasses = Set(holdings.compactMap { $0["assetclass"] as? String }).sorted()
         let regions = Set(holdings.compactMap { $0["countryregion"] as? String }).sorted()
-        
-        var summary = "SYMBOLS: \(symbols.joined(separator: ","))\n"
-        summary += "COMPANIES: \(companies.joined(separator: ","))\n"
-        summary += "ASSETS: \(assetClasses.joined(separator: ","))\n"
-        summary += "REGIONS: \(regions.joined(separator: ","))"
-        
-        return summary
+
+        return """
+        SYMBOLS: \(symbols.joined(separator: ","))
+        COMPANIES: \(companies.joined(separator: ","))
+        ASSETS: \(assetClasses.joined(separator: ","))
+        REGIONS: \(regions.joined(separator: ","))
+        """
     }
 }
