@@ -19,8 +19,8 @@ struct HoldingsResponse: Codable {
 }
 
 struct GetHoldingsTool: Tool {
-    let name = "get_holdings"
-    let description = "Retrieve portfolio holdings, filterable by symbol, asset class, region, account type, profit/loss, or value."
+    static var name: String = "get_holdings"
+    let description = "Retrieve holdings, filterable by symbol, asset class, region, account type, profit/loss, or value."
     
     @Generable
     struct Arguments {
