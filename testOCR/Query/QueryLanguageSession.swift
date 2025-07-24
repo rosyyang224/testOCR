@@ -62,9 +62,11 @@ class QueryLanguageSession {
         }
         
         let tools: [any Tool] = [
-            getHoldingsTool(isSessionStart: true)
+            getHoldingsTool(isSessionStart: true),
+            getPortfolioValTool(isSessionStart: true),
+            getTransactionsTool(isSessionStart: true)
+
         ]
-        print("getHoldingsTool created")
         
         let instructions = instructions
         print(instructions)
@@ -85,35 +87,11 @@ class QueryLanguageSession {
         }
     }
     
-//    private func buildSessionInstructions() -> Instructions {
-//        // Get context using our clean architecture
-//        let context = ContextManager.shared.getOptimizedContext()
-//        
-//        let instructions = Instructions {
-//            "Your job is a portfolio assistant, returning information in a chat-friendly way that explains reasoning."
-//            
-//            
-//            "Always use the get_holdings tool for questions about holdings."
-//            
-//            """
-//            For holdings queries, use `get_holdings` which returns JSON containing:
-//                - 'holdings': array of matching holdings with complete data \
-//                  (symbol, marketvalueinbccy, marketplinsccy, assetclass, countryregion, accounttype, etc.)
-//                - 'count': number of filtered results
-//                - 'total_holdings': total portfolio holdings count
-//            """
-//                        
-//        }
-//        print(instructions)
-//        return instructions
-//    }
-//    
     // MARK: - Query Processing
     
     func send(_ query: String) async throws -> String {
         var lastError: Error?
         
-        // Attempt with error recovery
         for attempt in 1...maxSessionAttempts {
             do {
                 let response = try await attemptSendQuery(query)
@@ -129,7 +107,6 @@ class QueryLanguageSession {
                 conversationHistory.append(turn)
                 totalTokensUsed += tokenEstimate
                 
-                // Maintain conversation history
                 trimConversationHistory()
                 checkContextHealth()
                 
@@ -193,7 +170,7 @@ class QueryLanguageSession {
                 try await recreateSessionWithContinuity()
             }
         } else if currentEstimate > warningThreshold {
-            print("⚠️ Context approaching limit (\(currentEstimate) tokens)")
+            print("Context approaching limit (\(currentEstimate) tokens)")
         }
     }
     
@@ -287,18 +264,19 @@ class QueryLanguageSession {
     func getContextStats() -> String {
         let context = ContextManager.shared.getOptimizedContext()
         let currentEstimate = estimatedContextSize + totalTokensUsed
-        
+
         return """
-        Portfolio Context:
-        - Schema: \(context.compactSchema.count) chars
-        - Portfolio: \(context.portfolioSummary.count) chars
-        - Total context: \(context.fullSessionContext.count) chars
-        
-        Session Stats:
-        - Attempts: \(sessionAttempts)/\(maxSessionAttempts)
+        ── Context Summary ──
+        - Schema size: \(context.compactSchema.count) characters
+        - Portfolio summary size: \(context.portfolioSummary.count) characters
+        - Last updated: \(format(context.lastUpdated))
+
+        ── Session Stats ──
+        - Session attempts: \(sessionAttempts)/\(maxSessionAttempts)
         - Conversation turns: \(conversationHistory.count)
         - Tokens used: \(totalTokensUsed)
-        - Context estimate: \(currentEstimate)
+        - Prompt estimate: \(estimatedContextSize)
+        - Total context size: \(currentEstimate) tokens
         - First interaction: \(isFirstInteraction)
         """
     }
