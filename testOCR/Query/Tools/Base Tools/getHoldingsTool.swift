@@ -55,7 +55,7 @@ struct GetHoldingsTool: Tool {
         self.holdingsProvider = holdingsProvider
     }
     
-    func call(arguments: Arguments) async throws -> ToolOutput {
+    func call(arguments: Arguments) async throws -> some PromptRepresentable {
         print("[GetHoldingsTool] called with arguments:")
         print("  symbol: \(arguments.symbol ?? "nil")")
         print("  assetclass: \(arguments.assetclass ?? "nil")")
@@ -103,9 +103,9 @@ struct GetHoldingsTool: Tool {
             encoder.outputFormatting = .prettyPrinted
             let jsonData = try encoder.encode(response)
             let jsonString = String(data: jsonData, encoding: .utf8) ?? "Error encoding holdings data"
-            return ToolOutput(jsonString)
+            return jsonString
         } catch {
-            return ToolOutput("Error serializing holdings: \(error.localizedDescription)")
+            return "Error serializing holdings: \(error.localizedDescription)"
         }
     }
 }
@@ -116,15 +116,4 @@ func getHoldingsTool(isSessionStart: Bool = false) -> GetHoldingsTool {
     }
     
     return GetHoldingsTool(holdingsProvider: { container.holdings })
-}
-
-func loadMockDataContainer(from jsonString: String) -> MockDataContainer? {
-    let data = Data(jsonString.utf8)
-    let decoder = JSONDecoder()
-    do {
-        return try decoder.decode(MockDataContainer.self, from: data)
-    } catch {
-        print("Failed to decode mock data: \(error)")
-        return nil
-    }
 }
