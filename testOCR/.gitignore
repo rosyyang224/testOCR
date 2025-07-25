@@ -7,3 +7,4 @@ coreml-OpenELM-3B-Instruct/
 llms/qwen2.5-0.5b/
 Anemll/
 Data/
+*.pdf
